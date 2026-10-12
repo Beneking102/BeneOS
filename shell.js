@@ -100,7 +100,7 @@
   cbtn.onclick = e => { e.stopPropagation(); togglePanel(cc, renderCC); };
   bell.onclick = e => { e.stopPropagation(); unread = 0; updateBell(); togglePanel(cc, renderCC); };
   $("#clock").onclick = e => { e.stopPropagation(); cy = undefined; togglePanel(cal, renderCal); };
-  document.addEventListener("pointerdown", e => { if (!e.target.closest("#ctx, #cc, #cal, #tray")) hideAll(); });
+  document.addEventListener("pointerdown", e => { if (!e.target.closest?.("#ctx, #cc, #cal, #tray")) hideAll(); });
 
   /* ---------- Desktop-Widgets ---------- */
   const wid = el("div"); wid.id = "widgets";

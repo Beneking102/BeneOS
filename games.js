@@ -351,11 +351,13 @@ window.EXTRA_APPS = window.EXTRA_APPS || {};
           const c = p.bad ? "#ff2bd6" : "#00f0ff", jx = p.bad ? (Math.random() - .5) * 2 : 0;
           g.fillStyle = "rgba(6,10,22,.92)"; g.strokeStyle = c; g.shadowColor = c; g.shadowBlur = 12; g.lineWidth = 2;
           g.beginPath(); g.roundRect(p.x + jx, p.y, PW, PH, 9); g.fill(); g.stroke(); g.shadowBlur = 0;
-          g.fillStyle = c; g.font = "bold 13px monospace"; g.textAlign = "left"; g.textBaseline = "middle"; g.fillText((p.bad ? "⚠ " : "✓ ") + p.label, p.x + 10 + jx, p.y + PH / 2 + 1);
+          g.fillStyle = c; g.strokeStyle = c; g.lineWidth = 2; g.beginPath(); const cy = p.y + PH / 2;
+          if (p.bad) { g.moveTo(p.x + 11 + jx, cy + 5); g.lineTo(p.x + 17 + jx, cy - 6); g.lineTo(p.x + 23 + jx, cy + 5); g.closePath(); } else { g.moveTo(p.x + 11 + jx, cy); g.lineTo(p.x + 15 + jx, cy + 4); g.lineTo(p.x + 23 + jx, cy - 5); }
+          g.stroke(); g.font = "bold 13px monospace"; g.textAlign = "left"; g.textBaseline = "middle"; g.fillText(p.label, p.x + 30 + jx, cy + 1);
         });
         parts.forEach(p => { g.globalAlpha = clamp(p.l, 0, 1); g.fillStyle = p.col; g.fillRect(p.x - 2, p.y - 2, 4, 4); }); g.globalAlpha = 1;
         pops.forEach(p => { g.globalAlpha = clamp(p.l, 0, 1); g.fillStyle = p.bad ? "#ff5470" : "#39ff88"; g.font = "bold 15px monospace"; g.textAlign = "center"; g.fillText(p.txt, p.x, p.y - (1 - p.l) * 26); }); g.globalAlpha = 1;
-        if (state === "run" && combo >= 8 && emp <= 0) { g.fillStyle = "#00f0ff"; g.font = "bold 13px monospace"; g.textAlign = "left"; g.fillText("⚡ EMP bereit – Leertaste / Taste", 12, H - 12); }
+        if (state === "run" && combo >= 8 && emp <= 0) { g.fillStyle = "#00f0ff"; g.font = "bold 13px monospace"; g.textAlign = "left"; g.fillText("EMP bereit – Leertaste / Taste", 12, H - 12); }
         g.restore();
       };
       const loop = ts => {

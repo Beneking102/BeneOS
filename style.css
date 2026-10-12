@@ -662,8 +662,6 @@ body.mobile .tkeys { display: flex; }
 /* Mobile: Korrekturen */
 body.mobile .win { inset: 0 !important; }
 body.mobile.kb #desktop { bottom: 0; }
-body.mobile #start-btn { font-size: 0; width: 52px; padding: 0; margin: 8px 4px 8px 10px; }
-body.mobile #start-btn::after { content: "⏻"; font-size: 22px; }
 #startmenu button > span { display: inline-block; width: 28px; text-align: center; }
 body.mobile .gm-foot { display: none; }
 
@@ -729,3 +727,24 @@ body.mobile .task.active { display: flex; }
 
 .chip .ico, .btn .ico { display: inline-block; width: 15px; height: 15px; vertical-align: -3px; margin-right: 6px; }
 .mh-chips .chip { display: inline-flex; align-items: center; }
+
+/* ===== v12: Emoji/Symbole als einheitliche Icons ===== */
+.ico.inl { display: inline-block; width: 1.18em; height: 1.18em; vertical-align: -.22em; margin: 0 .12em; stroke-width: 1.9; }
+.btn .ico.inl, .chip .ico.inl { margin: 0 .22em 0 0; }
+.gm-key .ico.inl { width: 1.3em; height: 1.3em; margin: 0; vertical-align: middle; }
+.gm-key:active .ico { stroke: #000; } .gm-key:active .ico .fl { fill: rgba(0,0,0,.25); stroke: #000; }
+.gm-primary .ico, .ck.eq .ico, .gm-primary .ico .fl, .gm-primary .ico .a2 { stroke: #04060e; } .gm-primary .ico .fl { fill: none; }
+.titlebar button .ico.inl { width: 1.05em; height: 1.05em; margin: 0; vertical-align: -.15em; } .titlebar button .ico { stroke: var(--text); } .titlebar .x:hover .ico { stroke: #fff; }
+#start-btn .ico { stroke: #04060e; stroke-width: 2.2; margin-right: .3em; } #start-btn .ico .a2 { stroke: #04060e; }
+.tile > span .ico.inl, .utile > span .ico.inl { width: 1.35em; height: 1.35em; margin: 0; vertical-align: middle; }
+.utile > span, .tile > span { display: grid; place-items: center; }
+h1 .ico.inl, h2 .ico.inl { margin-right: .3em; }
+.gm-badge .ico.inl { width: 1em; height: 1em; }
+.toast .ico.inl, .note .ico.inl { width: 1.2em; height: 1.2em; }
+.pill small .ico.inl { width: 1em; height: 1em; }
+body.mobile #start-btn .sb-t { display: none; }
+body.mobile #start-btn { display: grid; place-items: center; font-size: 22px; width: 52px; padding: 0; margin: 8px 4px 8px 10px; }
+body.mobile #start-btn .ico { margin: 0; width: 1.1em; height: 1.1em; }
+body.mobile .titlebar .mn .ico, body.mobile .titlebar .mn::after { display: none; }
+body.mobile .titlebar .mn { font-size: 0; width: 44px; background: no-repeat center / 22px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cfeaff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 11l8-6.5 8 6.5'/%3E%3Cpath d='M6.5 9.8v9.7h11V9.8'/%3E%3Cpath d='M10 19.5v-5h4v5'/%3E%3C/svg%3E"); }
+.titlebar button .ico, .titlebar button .ico * { stroke: var(--text); } .titlebar .x:hover .ico, .titlebar .x:hover .ico * { stroke: #fff; }

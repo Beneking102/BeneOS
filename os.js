@@ -622,7 +622,7 @@ start.onclick = e => {
   else if (b.dataset.act === "lock") lockScreen();
   else if (b.dataset.act === "off") shutdown();
 };
-document.addEventListener("pointerdown", e => { if (!e.target.closest("#startmenu, #start-btn")) closeStart(); });
+document.addEventListener("pointerdown", e => { if (!e.target.closest?.("#startmenu, #start-btn")) closeStart(); });
 
 /* Repos laden: GitHub-API (1h Cache) -> alter Cache -> eingebetteter Snapshot */
 async function loadRepos() {
@@ -660,8 +660,8 @@ const tickClock = () => {
 tickClock(); setInterval(tickClock, 10000);
 
 /* ---------- Verknüpfungen & Toasts ---------- */
-document.addEventListener("click", e => { const o = e.target.closest("[data-open]"); if (o) openApp(o.dataset.open); });
-document.addEventListener("pointerdown", e => { if (e.target.closest("button, a, .icon")) sfx("click"); }, true);
+document.addEventListener("click", e => { const o = e.target.closest?.("[data-open]"); if (o) openApp(o.dataset.open); });
+document.addEventListener("pointerdown", e => { if (e.target.closest?.("button, a, .icon")) sfx("click"); }, true);
 const notifications = [];
 function toast(html) {
   sfx("notify");
