@@ -27,6 +27,22 @@ const PROFILE = {
       topics: ["Advanced XSS", "SQL Injection", "XXE", "SSRF", "Deserialisierung", "WAF-/Filter-Bypass", "API-Security"],
     },
   ],
+  highlights: [                              // Spotlight-Projekte (Texte aus meinem GitHub-Profil)
+    { name: "bene-guard", desc: "VS-Code-Extension als Echtzeit-Security-Assistent: scannt npm-Abhängigkeiten per OSV auf CVEs, prüft Security-Header (Next.js, Vercel, Netlify, Helmet), erzeugt STRIDE-Threat-Models und bewertet Projekte von A+ bis F.", tags: ["TypeScript", "VS Code API", "OSV", "OWASP", "STRIDE"], url: "https://bene-guard-showcase.vercel.app" },
+    { name: "bene-npm-scanner", desc: "NPM-Dependency-CVE-Scanner: package.json einfügen und einen vollständigen Schwachstellenbericht über OSV.dev erhalten. Kein Login, keine Speicherung, kein Tracking.", tags: ["Next.js", "TypeScript", "OSV.dev"], url: "https://bene-npm-scanner.vercel.app" },
+    { name: "Benedictum", desc: "Eine lateinische Esoterik-Programmiersprache, deren Quelltext wie ein Gebet klingt. 14 Befehle, Turing-vollständig, in C99 geschrieben – mit Tape-Debugger, Tokenizer und Python-Interpreter.", tags: ["C99", "Esolang", "MIT"], url: "https://esolangs.org/wiki/Benedictum" },
+    { name: "bene-ui", desc: "Security-themed React-Komponentenbibliothek für Dashboards, Scanner und Threat-Visualisierung.", tags: ["React", "UI", "npm"], url: "https://bene-ui.vercel.app" },
+    { name: "bene-design-fonts", desc: "Zwei selbst gebaute Schriften: BeneHack (eckig, kondensiert, cyber) und BeneComic (verspielt). Mit Tailwind-Plugin und React-Komponente.", tags: ["fonttools", "React", "Tailwind"], url: "https://bene-design-font-preview.vercel.app" },
+    { name: "ChromaForge", desc: "Design-Plattform für Farbpaletten und Themes mit Farbtheorie-Tools und Palette-Generator.", tags: ["Color Theory", "UI/UX"], url: "https://chromaforge.netlify.app" },
+    { name: "DesignTool Hub", desc: "Die Anlaufstelle für den Start neuer Projekte: die besten Design-Ressourcen an einem Ort.", tags: ["Web Design", "Ressourcen"], url: "https://designtool.dev" },
+    { name: "bene-anti-boredom-space", desc: "In Arbeit: drei Browser-Games im Turborepo – DRIFT (Physik-Puzzle), GHOST.SH (Terminal-Hacker-Ermittlung) und GRIDLOCK (Live-Verkehrssteuerung mit OSM).", tags: ["Turborepo", "Canvas 2D", "TypeScript"], url: "https://github.com/Beneking102/bene-anti-boredom-space" },
+  ],
+  stack: {
+    "Frontend": ["React", "Next.js", "TypeScript", "Tailwind CSS", "Motion"],
+    "Backend & API": ["Node.js", "Python", "FastAPI", "GraphQL", "Express"],
+    "DevOps & Cloud": ["Docker", "GitHub Actions", "AWS", "Kubernetes", "Firebase", "Netlify", "Vercel"],
+    "Security": ["OSV / CVE-Analyse", "OWASP", "STRIDE", "Web-App-Pentesting", "Supply-Chain Security"],
+  },
   live: [                                    // Live-Projekte (außerhalb von GitHub-Repos)
     { name: "bene-guard", desc: "VS-Code-Extension: CVE-Scan, Header-Lint, STRIDE", url: "https://bene-guard-showcase.vercel.app" },
     { name: "ChromaForge", desc: "Farbpaletten & Themes", url: "https://chromaforge.netlify.app" },
@@ -53,54 +69,43 @@ const store = {
 };
 
 /* ---------- Einstellungen ---------- */
-const settings = Object.assign({ accent: "#00f0ff", accent2: "#ff2bd6", matrix: !matchMedia("(prefers-reduced-motion: reduce)").matches, crt: true, sound: true, volume: .5 }, store.get("settings", {}));
+const THEME_NAMES = {
+  cyan: ["#00f0ff", "#ff2bd6"], pink: ["#ff2bd6", "#00f0ff"], green: ["#39ff88", "#00f0ff"], orange: ["#ff9f1a", "#ff2bd6"],
+  purple: ["#a66bff", "#00f0ff"], red: ["#ff3b5c", "#ffb020"], gold: ["#ffd23c", "#ff2bd6"], ice: ["#7dffcf", "#7aa2ff"],
+};
+const THEMES = Object.values(THEME_NAMES);
+const saved = store.get("settings", {});
+const settings = Object.assign({ accent: "#00f0ff", accent2: "#ff2bd6", wallpaper: "matrix", crt: false, sound: true, volume: .5, lite: false }, saved);
+if (saved.matrix === false && !saved.wallpaper) settings.wallpaper = "off";
+if (!saved.wallpaper && matchMedia("(prefers-reduced-motion: reduce)").matches) settings.wallpaper = "aurora";
+delete settings.matrix;
 // Gespeicherte Werte nie blind vertrauen
 const HEX = /^#[0-9a-f]{6}$/i;
 if (!HEX.test(settings.accent)) settings.accent = "#00f0ff";
 if (!HEX.test(settings.accent2)) settings.accent2 = "#ff2bd6";
+if (!Wallpaper.modes.includes(settings.wallpaper)) settings.wallpaper = "matrix";
 settings.volume = Math.min(1, Math.max(0, Number(settings.volume) || 0));
+settings.lite = !!settings.lite; settings.crt = !!settings.crt; settings.sound = settings.sound !== false;
 function applySettings() {
-  document.documentElement.style.setProperty("--accent", settings.accent);
-  document.documentElement.style.setProperty("--accent2", settings.accent2);
+  const r = document.documentElement.style;
+  r.setProperty("--accent", settings.accent);
+  r.setProperty("--accent2", settings.accent2);
   document.body.classList.toggle("crt", settings.crt);
+  document.body.classList.toggle("lite", settings.lite);
+  Wallpaper.set(settings.wallpaper, settings.accent, settings.accent2);
   SFX.set(settings.sound, settings.volume);
   store.set("settings", settings);
 }
-
-/* ---------- Matrix-Hintergrund ---------- */
-const canvas = $("#matrix"), cx = canvas.getContext("2d");
-let drops = [];
-const FS = 16;
-function resizeMatrix() {
-  canvas.width = innerWidth; canvas.height = innerHeight;
-  drops = Array.from({ length: Math.ceil(innerWidth / FS) }, () => Math.random() * -50);
-}
-addEventListener("resize", resizeMatrix);
-resizeMatrix();
-const GLYPHS = "アイウエオカキクケコサシスセソ0123456789ABCDEF<>/{}$#";
-let lastDraw = 0;
-function drawMatrix(t) {
-  requestAnimationFrame(drawMatrix);
-  if (document.hidden || t - lastDraw < 55) return;
-  lastDraw = t;
-  if (!settings.matrix) { cx.fillStyle = "#05060d"; cx.fillRect(0, 0, canvas.width, canvas.height); return; }
-  cx.fillStyle = "rgba(5,6,13,.16)";
-  cx.fillRect(0, 0, canvas.width, canvas.height);
-  cx.fillStyle = settings.accent;
-  cx.globalAlpha = .55;
-  cx.font = FS + "px monospace";
-  drops.forEach((y, i) => {
-    cx.fillText(GLYPHS[(Math.random() * GLYPHS.length) | 0], i * FS, y * FS);
-    drops[i] = y * FS > canvas.height && Math.random() > .975 ? 0 : y + 1;
-  });
-  cx.globalAlpha = 1;
-}
-requestAnimationFrame(drawMatrix);
 
 /* ---------- Fenster-Manager ---------- */
 const winLayer = $("#windows"), tasks = $("#tasks");
 const open = {};            // id -> {win, btn, cleanup}
 let zTop = 10, cascade = 0;
+
+// Wenn ein maximiertes Fenster alles verdeckt, muss der Hintergrund nicht rendern
+function updateOcclusion() {
+  Wallpaper.pause(Object.values(open).some(e => e.win.classList.contains("max") && !e.win.classList.contains("hidden")));
+}
 
 function focusWin(id) {
   Object.entries(open).forEach(([k, w]) => {
@@ -135,29 +140,68 @@ function openApp(id) {
   entry.cleanup = app.render($(".wbody", win), win) || null;
 
   const bar = $(".titlebar", win);
-  $(".mn", win).onclick = () => { sfx("minimize"); win.classList.add("hidden"); btn.classList.remove("active"); };
-  $(".mx", win).onclick = () => { win.classList.toggle("max"); sfx("maximize"); };
+  const setHidden = h => { win.classList.toggle("hidden", h); if (h) btn.classList.remove("active"); updateOcclusion(); };
+  $(".mn", win).onclick = () => { sfx("minimize"); setHidden(true); };
+  $(".mx", win).onclick = () => {
+    if (!win.classList.contains("max")) win._rect = { w: win.offsetWidth, h: win.offsetHeight };
+    win.classList.toggle("max"); delete win.dataset.snap; sfx("maximize"); updateOcclusion();
+  };
   $(".x", win).onclick = () => closeApp(id);
-  bar.ondblclick = e => { if (e.target === bar || e.target.tagName === "B") win.classList.toggle("max"); };
+  bar.ondblclick = e => { if (e.target === bar || e.target.tagName === "B") $(".mx", win).onclick(); };
   win.addEventListener("pointerdown", () => focusWin(id));
   btn.onclick = () => {
-    if (win.classList.contains("hidden")) { win.classList.remove("hidden"); focusWin(id); }
-    else if (win.classList.contains("active")) { win.classList.add("hidden"); btn.classList.remove("active"); }
+    if (win.classList.contains("hidden")) { setHidden(false); focusWin(id); }
+    else if (win.classList.contains("active")) setHidden(true);
     else focusWin(id);
   };
 
-  // Verschieben
+  // Verschieben mit Snapping: Rand links/rechts = halbe Breite, oben = maximieren
   bar.addEventListener("pointerdown", e => {
-    if (e.target.closest("button") || win.classList.contains("max")) return;
-    const dx = e.clientX - win.offsetLeft, dy = e.clientY - win.offsetTop;
-    bar.setPointerCapture(e.pointerId);
-    const move = ev => {
-      win.style.left = Math.min(Math.max(ev.clientX - dx, -win.offsetWidth + 80), innerWidth - 80) + "px";
-      win.style.top = Math.min(Math.max(ev.clientY - dy, 0), innerHeight - 90) + "px";
+    if (e.target.closest("button") || e.button !== 0) return;
+    const snapEl = $("#snap"), dock = 64;
+    let dx = e.clientX - win.offsetLeft, dy = e.clientY - win.offsetTop, zone = null, started = false, raf = 0, last = e;
+    try { bar.setPointerCapture(e.pointerId); } catch { /* synthetische Events */ }
+    const rects = { max: [0, 0, innerWidth, innerHeight - dock], left: [0, 0, innerWidth / 2, innerHeight - dock], right: [innerWidth / 2, 0, innerWidth / 2, innerHeight - dock] };
+    const zoneOf = ev => (ev.clientY <= 6 ? "max" : ev.clientX <= 6 ? "left" : ev.clientX >= innerWidth - 7 ? "right" : null);
+    const showZone = () => {
+      if (zone) { const [l, t, w, h] = rects[zone]; Object.assign(snapEl.style, { left: l + "px", top: t + "px", width: w + "px", height: h + "px" }); snapEl.hidden = false; }
+      else snapEl.hidden = true;
     };
-    const up = () => { bar.removeEventListener("pointermove", move); bar.removeEventListener("pointerup", up); };
-    bar.addEventListener("pointermove", move);
-    bar.addEventListener("pointerup", up);
+    const frame = () => {
+      raf = 0;
+      win.style.left = Math.min(Math.max(last.clientX - dx, -win.offsetWidth + 80), innerWidth - 80) + "px";
+      win.style.top = Math.min(Math.max(last.clientY - dy, 0), innerHeight - 110) + "px";
+    };
+    const move = ev => {
+      last = ev;
+      if (!started) {
+        if (Math.abs(ev.clientX - e.clientX) + Math.abs(ev.clientY - e.clientY) < 4) return;
+        started = true;
+        if (win.classList.contains("max") || win.dataset.snap) {   // aus Snap/Maximiert herausziehen
+          const r = win._rect || { w: Math.min(app.w, innerWidth - 20), h: Math.min(app.h, innerHeight - 80) };
+          win.classList.remove("max"); delete win.dataset.snap;
+          win.style.width = r.w + "px"; win.style.height = r.h + "px";
+          dx = r.w / 2; dy = 18; updateOcclusion();
+        }
+        win.classList.add("dragging");
+      }
+      zone = zoneOf(ev); showZone();
+      if (!raf) raf = requestAnimationFrame(frame);
+    };
+    const up = ev => {
+      bar.removeEventListener("pointermove", move); bar.removeEventListener("pointerup", up); bar.removeEventListener("pointercancel", up);
+      cancelAnimationFrame(raf); snapEl.hidden = true;
+      if (!started) return;
+      if (ev && ev.clientX !== undefined) zone = zoneOf(ev);
+      win.classList.remove("dragging");
+      if (zone) {
+        win._rect = { w: win.offsetWidth, h: win.offsetHeight };
+        if (zone === "max") win.classList.add("max");
+        else { const [l, t, w, h] = rects[zone]; Object.assign(win.style, { left: l + "px", top: t + "px", width: w + "px", height: h + "px" }); win.dataset.snap = zone; }
+        sfx("maximize"); updateOcclusion(); achieve("snap");
+      }
+    };
+    bar.addEventListener("pointermove", move); bar.addEventListener("pointerup", up); bar.addEventListener("pointercancel", up);
   });
   focusWin(id);
 }
@@ -167,10 +211,13 @@ function closeApp(id) {
   if (!e) return;
   sfx("close");
   if (e.cleanup) e.cleanup();
-  e.win.remove(); e.btn.remove();
   delete open[id];
+  e.btn.remove();
+  e.win.classList.add("closing");
+  setTimeout(() => e.win.remove(), 140);
   const last = Object.keys(open).pop();
   if (last) focusWin(last);
+  updateOcclusion();
 }
 
 /* ---------- Repos (live von GitHub) ---------- */
@@ -219,16 +266,25 @@ function repoApp(r) {
 /* ---------- Apps ---------- */
 const APPS = {
   about: {
-    title: "Über mich", icon: "👤", w: 540, h: 500,
+    title: "Über mich", icon: "👤", w: 600, h: 560,
     render(body) {
-      body.innerHTML = `<div class="pad">
-        <div class="about"><div class="avatar">${esc(PROFILE.name[0])}</div>
-        <div style="flex:1;min-width:200px"><h1>${esc(PROFILE.name)}</h1><div class="dim">${esc(PROFILE.tagline)}</div><div class="dim">📍 ${esc(PROFILE.location)}</div>
-        <div style="margin-top:6px">${(PROFILE.certs || []).map(c => `<button class="tag" data-open="certs" style="background:none;cursor:pointer">🏅 ${esc(c.short)}</button>`).join("")}</div></div></div>
-        <p>${esc(PROFILE.bio)}</p>
-        <div class="opbar"><button class="btn" data-open="projects">📁 Repos</button><button class="btn" data-open="certs">🏅 Zertifikate</button><button class="btn" data-open="ctf">🚩 CTF</button><button class="btn" data-open="terminal">⌨ Terminal</button><button class="btn" data-open="contact">✉ Kontakt</button></div>
-        <h2>Skills</h2>${PROFILE.skills.map(([n, v]) => `<div>${esc(n)} <span class="dim">${v}%</span></div><div class="bar"><div style="width:${v}%"></div></div>`).join("")}
-      </div>`;
+      const tabs = { profil: "Profil", highlights: "Highlights", stack: "Tech-Stack" };
+      const views = {
+        profil: () => `<div class="about"><div class="avatar">${esc(PROFILE.name[0])}</div>
+          <div style="flex:1;min-width:200px"><h1>${esc(PROFILE.name)}</h1><div class="dim">${esc(PROFILE.tagline)}</div><div class="dim">📍 ${esc(PROFILE.location)}</div>
+          <div style="margin-top:6px">${(PROFILE.certs || []).map(c => `<button class="tag" data-open="certs" style="cursor:pointer">🏅 ${esc(c.short)}</button>`).join("")}</div></div></div>
+          <p>${esc(PROFILE.bio)}</p>
+          <div class="opbar"><button class="btn" data-open="projects">📁 Repos</button><button class="btn" data-open="certs">🏅 Zertifikate</button><button class="btn" data-open="ctf">🚩 CTF</button><button class="btn" data-open="terminal">⌨ Terminal</button><button class="btn" data-open="contact">✉ Kontakt</button></div>
+          <h2>Skills</h2>${PROFILE.skills.map(([n, v]) => `<div>${esc(n)} <span class="dim">${v}%</span></div><div class="bar"><div style="width:${v}%"></div></div>`).join("")}`,
+        highlights: () => `<div class="cards">${(PROFILE.highlights || []).map(h => `<div class="card"><h3>${esc(h.name)}</h3><p>${esc(h.desc)}</p>${h.tags.map(t => `<span class="tag">${esc(t)}</span>`).join("")}${safeUrl(h.url) ? `<div style="margin-top:8px"><a href="${esc(safeUrl(h.url))}" target="_blank" rel="noopener noreferrer">→ ansehen</a></div>` : ""}</div>`).join("")}</div>`,
+        stack: () => Object.entries(PROFILE.stack || {}).map(([k, v]) => `<h2>${esc(k)}</h2><div>${v.map(t => `<span class="tag">${esc(t)}</span>`).join("")}</div>`).join(""),
+      };
+      let cur = "profil";
+      const draw = () => {
+        body.innerHTML = `<div class="pad"><div class="tabs">${Object.entries(tabs).map(([k, t]) => `<button class="tab ${k === cur ? "on" : ""}" data-tab="${k}">${t}</button>`).join("")}</div>${views[cur]()}</div>`;
+        body.querySelectorAll("[data-tab]").forEach(b => { b.onclick = () => { cur = b.dataset.tab; sfx("menu"); draw(); }; });
+      };
+      draw();
     },
   },
   projects: {
@@ -252,7 +308,7 @@ const APPS = {
       const input = $("input", row);
       const hist = []; let hi = 0;
       const cmds = {
-        help: () => "Befehle: <span class='hi'>help about certs repos skills links neofetch nmap &lt;host&gt; ls cat open &lt;app|repo&gt; theme &lt;farbe&gt; matrix clear</span>",
+        help: () => "Befehle: <span class='hi'>help about certs repos skills links neofetch nmap &lt;host&gt; ls cat open &lt;app|repo&gt; theme &lt;farbe&gt; wallpaper &lt;name&gt; lock clear</span>",
         about: () => esc(PROFILE.bio),
         whoami: () => session.user === "guest" ? "guest (du bist hier nur zu Besuch 👀)" : session.user,
         repos: () => REPOS.map(r => `<span class="hi">${esc(r.name).padEnd(26)}</span>${esc(r.language || "-").padEnd(12)}${esc((r.description || "").slice(0, 60))}`).join("\n") || "Repos laden noch…",
@@ -280,14 +336,20 @@ const APPS = {
                            Apps: ${Object.keys(APPS).length} (${REPOS.length} Repos)
                            Browser: ${esc(navigator.userAgent.split(" ").pop())}</span>`,
         clear: () => { [...term.querySelectorAll(".out")].forEach(n => n.remove()); return null; },
-        matrix: () => { settings.matrix = !settings.matrix; applySettings(); return `Matrix: ${settings.matrix ? "an" : "aus"}`; },
+        wallpaper: a => {
+          if (!Wallpaper.modes.includes(a)) return `<span class="err">Hintergründe: ${Wallpaper.modes.join(", ")}</span>`;
+          settings.wallpaper = a; applySettings(); achieve("wallpaper");
+          return `<span class="ok">Hintergrund: ${Wallpaper.labels[a]}</span>`;
+        },
+        matrix: () => cmds.wallpaper(settings.wallpaper === "matrix" ? "off" : "matrix"),
+        lock: () => { lockScreen(); return null; },
         open: a => {
           const id = Object.keys(APPS).find(k => k.toLowerCase() === a || k.toLowerCase() === "repo:" + a);
           if (id) { openApp(id); return `<span class="ok">öffne ${esc(id.replace("repo:", ""))}…</span>`; }
           return `<span class="err">Unbekannte App. Verfügbar: ${Object.keys(APPS).map(k => k.replace("repo:", "")).join(", ")}</span>`;
         },
         theme: a => {
-          const map = { cyan: ["#00f0ff", "#ff2bd6"], pink: ["#ff2bd6", "#00f0ff"], green: ["#39ff88", "#00f0ff"], orange: ["#ff9f1a", "#ff2bd6"], purple: ["#a66bff", "#00f0ff"] };
+          const map = THEME_NAMES;
           if (!map[a]) return `<span class="err">Farben: ${Object.keys(map).join(", ")}</span>`;
           [settings.accent, settings.accent2] = map[a]; applySettings(); achieve("theme"); return `<span class="ok">Theme: ${a}</span>`;
         },
@@ -558,25 +620,31 @@ const APPS = {
     },
   },
   settings: {
-    title: "Einstellungen", icon: "⚙", w: 380, h: 400,
+    title: "Einstellungen", icon: "⚙", w: 460, h: 600,
     render(body) {
-      const themes = [["#00f0ff", "#ff2bd6"], ["#ff2bd6", "#00f0ff"], ["#39ff88", "#00f0ff"], ["#ff9f1a", "#ff2bd6"], ["#a66bff", "#00f0ff"]];
-      body.innerHTML = `<div class="pad"><h2 style="margin-top:0">Farbschema</h2><div class="swatches">${themes.map(([a, b]) => `<button class="sw ${a === settings.accent ? "on" : ""}" data-a="${a}" data-b="${b}" style="background:linear-gradient(135deg,${a} 50%,${b} 50%)" aria-label="Farbschema ${a}"></button>`).join("")}</div>
-        <h2>Effekte</h2><label class="chk"><input type="checkbox" id="s-matrix"> Matrix-Hintergrund</label><label class="chk"><input type="checkbox" id="s-crt"> CRT-Scanlines</label><label class="chk"><input type="checkbox" id="s-snd"> Sounds</label><label class="chk">Lautstärke <input type="range" id="s-vol" min="0" max="100" style="flex:1"><button class="btn" id="s-test">Test</button></label>
-        <h2>System</h2><button class="btn" id="s-reset">Notizen &amp; Einstellungen zurücksetzen</button></div>`;
-      $("#s-matrix", body).checked = settings.matrix; $("#s-crt", body).checked = settings.crt;
-      $("#s-snd", body).checked = settings.sound; $("#s-vol", body).value = Math.round(settings.volume * 100);
-      $("#s-snd", body).onchange = e => { settings.sound = e.target.checked; applySettings(); sfx("notify"); };
-      $("#s-vol", body).oninput = e => { settings.volume = e.target.value / 100; applySettings(); };
-      $("#s-vol", body).onchange = () => sfx("notify");
-      $("#s-test", body).onclick = () => { sfx("startup"); };
-      $("#s-matrix", body).onchange = e => { settings.matrix = e.target.checked; applySettings(); };
-      $("#s-crt", body).onchange = e => { settings.crt = e.target.checked; applySettings(); };
-      body.querySelectorAll(".sw").forEach(b => b.onclick = () => {
-        settings.accent = b.dataset.a; settings.accent2 = b.dataset.b; applySettings(); achieve("theme");
-        body.querySelectorAll(".sw").forEach(x => x.classList.toggle("on", x === b));
-      });
-      $("#s-reset", body).onclick = () => { try { Object.keys(localStorage).filter(k => k.startsWith("beneos.")).forEach(k => localStorage.removeItem(k)); } catch { /* egal */ } location.reload(); };
+      const draw = () => {
+        body.innerHTML = `<div class="pad"><h2 style="margin-top:0">Farbschema</h2><div class="swatches">${THEMES.map(([a, b]) => `<button class="sw ${a === settings.accent ? "on" : ""}" data-a="${a}" data-b="${b}" style="background:linear-gradient(135deg,${a} 50%,${b} 50%)" aria-label="Farbschema ${a}"></button>`).join("")}</div>
+          <h2>Hintergrund</h2><div class="wps">${Wallpaper.modes.map(m => `<button class="wp ${m === settings.wallpaper ? "on" : ""}" data-wp="${m}"><i class="wp-${m}"></i>${Wallpaper.labels[m]}</button>`).join("")}</div>
+          <h2>Effekte & Leistung</h2>
+          <label class="chk"><input type="checkbox" id="s-crt"> CRT-Scanlines</label>
+          <label class="chk"><input type="checkbox" id="s-lite"> Performance-Modus <span class="dim">(kein Blur, keine Animationen)</span></label>
+          <h2>Sound</h2>
+          <label class="chk"><input type="checkbox" id="s-snd"> Sounds aktiv</label>
+          <label class="chk">Lautstärke <input type="range" id="s-vol" min="0" max="100" style="flex:1"><button class="btn" id="s-test">Test</button></label>
+          <h2>System</h2><div class="opbar"><button class="btn" data-open="sysinfo">ℹ Über BeneOS</button><button class="btn" id="s-reset">Daten zurücksetzen</button></div></div>`;
+        $("#s-crt", body).checked = settings.crt; $("#s-lite", body).checked = settings.lite;
+        $("#s-snd", body).checked = settings.sound; $("#s-vol", body).value = Math.round(settings.volume * 100);
+        $("#s-crt", body).onchange = e => { settings.crt = e.target.checked; applySettings(); };
+        $("#s-lite", body).onchange = e => { settings.lite = e.target.checked; applySettings(); };
+        $("#s-snd", body).onchange = e => { settings.sound = e.target.checked; applySettings(); sfx("notify"); };
+        $("#s-vol", body).oninput = e => { settings.volume = e.target.value / 100; applySettings(); };
+        $("#s-vol", body).onchange = () => sfx("notify");
+        $("#s-test", body).onclick = () => sfx("startup");
+        body.querySelectorAll(".sw").forEach(b => { b.onclick = () => { settings.accent = b.dataset.a; settings.accent2 = b.dataset.b; applySettings(); achieve("theme"); draw(); }; });
+        body.querySelectorAll(".wp").forEach(b => { b.onclick = () => { settings.wallpaper = b.dataset.wp; applySettings(); achieve("wallpaper"); draw(); }; });
+        $("#s-reset", body).onclick = () => { try { Object.keys(localStorage).filter(k => k.startsWith("beneos.")).forEach(k => localStorage.removeItem(k)); } catch { /* egal */ } location.reload(); };
+      };
+      draw();
     },
   },
 };
@@ -607,19 +675,35 @@ function buildStart() {
   const groups = {};
   Object.entries(APPS).forEach(([id, a]) => { (groups[a.group || "System"] ||= []).push(id); });
   const order = ["System", "Security Lab", "Security Repos", "Dev Repos", "Fun"];
-  start.innerHTML = `<header>BENE<span class="dim">OS</span></header><div class="slist">` +
+  start.innerHTML = `<header><div class="who"><span class="avatar sm">${esc(PROFILE.name[0])}</span><div><b>${esc(PROFILE.name)}</b><div class="dim">${esc(session.user)}@beneos</div></div></div>
+    <input id="ssearch" class="field" placeholder="Apps &amp; Repos suchen …" autocomplete="off" spellcheck="false" aria-label="Suchen"></header>
+    <div class="slist">` +
     order.filter(g => groups[g]).map(g => `<div class="grp">${g}</div>` + groups[g].map(id => `<button data-app="${esc(id)}"><span>${APPS[id].icon}</span><b></b></button>`).join("")).join("") +
-    `</div><hr><button data-act="off"><span>⏻</span>Herunterfahren</button>`;
+    `<div class="dim" id="snone" hidden style="padding:12px 16px">Nichts gefunden.</div></div>
+    <div class="sfoot"><button data-act="lock"><span>🔒</span>Sperren</button><button data-act="off"><span>⏻</span>Herunterfahren</button></div>`;
   start.querySelectorAll("[data-app]").forEach(b => { $("b", b).textContent = APPS[b.dataset.app].title; });
+  const q = $("#ssearch", start);
+  q.oninput = () => {
+    const v = q.value.trim().toLowerCase(); let any = false;
+    start.querySelectorAll("[data-app]").forEach(b => { const show = !v || b.textContent.toLowerCase().includes(v) || b.dataset.app.toLowerCase().includes(v); b.hidden = !show; any ||= show; });
+    start.querySelectorAll(".grp").forEach(g => { let n = g.nextElementSibling, has = false; while (n && !n.classList.contains("grp")) { if (n.dataset.app && !n.hidden) has = true; n = n.nextElementSibling; } g.hidden = !has; });
+    $("#snone", start).hidden = any;
+  };
+  q.onkeydown = e => { if (e.key === "Enter") { const b = start.querySelector("[data-app]:not([hidden])"); if (b) { openApp(b.dataset.app); achieve("search"); } } };
 }
 buildStart();
 const closeStart = () => { start.hidden = true; };
-$("#start-btn").onclick = e => { e.stopPropagation(); start.hidden = !start.hidden; sfx("menu"); };
+function toggleStart(show) {
+  start.hidden = show === undefined ? !start.hidden : !show;
+  if (!start.hidden) { const q = $("#ssearch", start); q.value = ""; q.dispatchEvent(new Event("input")); q.focus(); }
+}
+$("#start-btn").onclick = e => { e.stopPropagation(); toggleStart(); sfx("menu"); };
 start.onclick = e => {
   const b = e.target.closest("button");
   if (!b) return;
   if (b.dataset.app) openApp(b.dataset.app);
-  else { sfx("shutdown"); setTimeout(() => location.reload(), 1400); }
+  else if (b.dataset.act === "lock") lockScreen();
+  else if (b.dataset.act === "off") shutdown();
 };
 document.addEventListener("pointerdown", e => { if (!e.target.closest("#startmenu, #start-btn")) closeStart(); });
 
@@ -646,33 +730,45 @@ async function loadRepos() {
   buildStart();
   bootLog(`Synchronisiere github.com/${PROFILE.user} ... ${REPOS.length} Repos (${repoSource})`);
   const tn = $("#tray-net"); if (tn) tn.textContent = `◉ ${REPOS.length} REPOS`;
+  document.dispatchEvent(new Event("repos"));
 }
 
-const clock = $("#clock");
-const tickClock = () => { clock.textContent = new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }); };
+const clock = $("#clock"), lclock = $("#lclock");
+const tickClock = () => {
+  const d = new Date(), time = d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+  clock.textContent = time + "\n" + d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+  $("b", lclock).textContent = time;
+  $("span", lclock).textContent = d.toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" });
+};
 tickClock(); setInterval(tickClock, 10000);
 
 /* ---------- Verknüpfungen & Toasts ---------- */
 document.addEventListener("click", e => { const o = e.target.closest("[data-open]"); if (o) openApp(o.dataset.open); });
 document.addEventListener("pointerdown", e => { if (e.target.closest("button, a, .icon")) sfx("click"); }, true);
+const notifications = [];
 function toast(html) {
   sfx("notify");
+  notifications.unshift({ html, t: Date.now() });
+  if (notifications.length > 30) notifications.pop();
+  document.dispatchEvent(new Event("notif"));
+  let box = $("#toasts");
+  if (!box) { box = el("div"); box.id = "toasts"; document.body.append(box); }
   const t = el("div", "toast", html);
-  document.body.append(t);
+  box.append(t);
   setTimeout(() => t.classList.add("out"), 4200);
   setTimeout(() => t.remove(), 4800);
 }
 
 /* ---------- Boot & Login ---------- */
 const BOOT = [
-  "BeneOS BIOS v1.0  (c) " + new Date().getFullYear(),
+  "BeneOS BIOS v3.0  (c) " + new Date().getFullYear(),
   "Prüfe Speicher ............ 640K OK  (ok, 64GB)",
   "Lade Kernel ............... OK",
   "Initialisiere Neon-Treiber  OK",
-  "Starte Matrix-Daemon ...... OK",
+  "Härte Sandbox (CSP) ....... OK",
+  "Starte Fenstermanager ..... OK",
   "Starte Security-Lab ....... OK",
   "",
-  "Willkommen, guest.",
 ];
 let booted = false;
 function finishBoot() {
@@ -681,8 +777,7 @@ function finishBoot() {
   applySettings();
   $("#boot").classList.add("out");
   setTimeout(() => $("#boot").remove(), 700);
-  $("#login").hidden = false;
-  $("#lp").focus();
+  showLogin();
 }
 function enterDesktop(user) {
   sfx("startup");
@@ -690,25 +785,27 @@ function enterDesktop(user) {
   session.user = user;
   $("#login").hidden = true;
   ["desktop", "taskbar"].forEach(id => { $("#" + id).hidden = false; });
+  document.body.classList.add("entered");
+  buildStart();
   const c = (PROFILE.certs || [])[0];
   if (c) { const w = $("#badge"); w.hidden = false; w.innerHTML = `<span>🏅</span><b>${esc(c.short)}</b><small>certified</small>`; w.onclick = () => openApp("certs"); }
   openApp("about");
   if (user === "admin") toast("🚩 Willkommen, <b>admin</b>! Flag: <code>BENE{d3f4ult_cr3ds_f41l}</code><br><small>Default-Credentials sind ein Klassiker – trag die Flag im Mini CTF ein.</small>");
-  else toast(`Willkommen, <b>${esc(user)}</b>. Probier <code>help</code> im Terminal 👾`);
+  else toast(`Willkommen, <b>${esc(user)}</b>. Drück <code>Strg+K</code> für die Suche oder tippe <code>help</code> im Terminal 👾`);
 }
-$("#login-form").onsubmit = e => {
-  e.preventDefault();
-  const u = $("#lu").value.trim().toLowerCase() || "guest", p = $("#lp").value;
-  const msg = $("#lmsg");
-  if ((u === "guest") || (u === "admin" && p === "admin")) { enterDesktop(u); return; }
-  sfx("error");
-  msg.textContent = "Zugriff verweigert.";
-  $("#lbox").classList.remove("shake"); void $("#lbox").offsetWidth; $("#lbox").classList.add("shake");
-};
+function shutdown() {
+  sfx("shutdown");
+  document.body.classList.add("off");
+  setTimeout(() => location.reload(), 1500);
+}
 applySettings();
 const log = $("#boot-log");
 function bootLog(line) { if (!booted) log.textContent += line + "\n"; }
 BOOT.forEach((line, i) => setTimeout(() => bootLog(line), i * 280));
 loadRepos();
-setTimeout(finishBoot, BOOT.length * 280 + 500);
+setTimeout(() => { const b = $("#bootbar"); if (b) b.classList.add("go"); }, BOOT.length * 280);
+setTimeout(finishBoot, BOOT.length * 280 + 1500);
 $("#boot").onclick = finishBoot;
+
+// Service Worker: schnelleres Nachladen + Offline-Fähigkeit (nur über HTTPS)
+if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});

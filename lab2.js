@@ -18,6 +18,10 @@ const ACH = {
   snake: ["🐍", "Schlangenbeschwörer", "10 Punkte bei Snake"],
   phish: ["🎣", "Phishing-Radar", "10/10 im Phishing-Quiz"],
   secret: ["🗝", "Digital-Archäologe", "Eine versteckte Datei gefunden"],
+  snap: ["🪟", "Fensterakrobat", "Ein Fenster an den Rand gesnappt"],
+  wallpaper: ["🖼", "Raumgestalter", "Den Hintergrund gewechselt"],
+  ctx: ["🖱", "Rechtsklick-Profi", "Das Desktop-Kontextmenü geöffnet"],
+  search: ["🔎", "Schnellstarter", "Eine App über die Suche gestartet"],
 };
 window.achieve = id => {
   if (!ACH[id]) return;

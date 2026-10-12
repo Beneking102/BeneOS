@@ -1,0 +1,54 @@
+name: Deploy to Netlify
+
+# Deployt bei jedem Push auf main, täglich (frischer Repo-Snapshot) und manuell.
+# Benötigt zwei Repository-Secrets:  NETLIFY_AUTH_TOKEN  und  NETLIFY_SITE_ID
+# Fehlt das Token, wird der Deploy übersprungen (der Workflow bleibt grün).
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prüfen, ob Netlify-Zugangsdaten gesetzt sind
+        id: gate
+        env:
+          TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          SITE: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          if [ -z "$TOKEN" ] || [ -z "$SITE" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "NETLIFY_AUTH_TOKEN / NETLIFY_SITE_ID fehlen - Deploy übersprungen."
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.skip != 'true'
+
+      - uses: actions/setup-node@v4
+        if: steps.gate.outputs.skip != 'true'
+        with:
+          node-version: 22
+
+      - name: Repo-Snapshot aktualisieren
+        if: steps.gate.outputs.skip != 'true'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/update-repos.mjs
+
+      - name: Zu Netlify deployen
+        if: steps.gate.outputs.skip != 'true'
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: npx --yes netlify-cli@27.12.0 deploy --prod --dir . --message "GitHub Actions ${{ github.sha }}"

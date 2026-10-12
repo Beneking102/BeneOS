@@ -18,6 +18,8 @@
 <meta name="twitter:image" content="https://os.benedikt-pkr.info/og-image.png">
 <link rel="canonical" href="https://os.benedikt-pkr.info/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2305060d'/%3E%3Cpath d='M16 3 5 7v8c0 7 5 12 11 14 6-2 11-7 11-14V7z' fill='none' stroke='%2300f0ff' stroke-width='2'/%3E%3Ctext x='16' y='21' font-size='13' font-family='monospace' font-weight='bold' fill='%23ff2bd6' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -26,20 +28,32 @@
 
 <div id="boot">
   <pre id="boot-log"></pre>
-  <div id="boot-hint">Klicken zum Überspringen</div>
+  <div id="boot-end">
+    <div id="bootlogo">BENE<span>OS</span></div>
+    <div id="bootbar"><i></i></div>
+    <div id="boot-hint">Klicken zum Überspringen</div>
+  </div>
 </div>
 
 <div id="login" hidden>
+  <div id="lclock"><b></b><span></span></div>
   <div class="lbox" id="lbox">
-    <div class="avatar">B</div>
+    <div class="ring"><div class="avatar" id="lavatar">B</div></div>
     <h1>BENE<span class="dim">OS</span></h1>
-    <form id="login-form" autocomplete="off">
-      <input class="field" id="lu" value="guest" aria-label="Benutzername" spellcheck="false">
-      <input class="field" id="lp" type="password" placeholder="Passwort (Gast: leer lassen)" aria-label="Passwort">
-      <button class="btn" style="width:100%">Anmelden ▶</button>
+    <div class="dim" id="lsub">Wähle ein Konto</div>
+    <div class="users" id="lusers">
+      <button class="utile" data-u="guest"><span>👤</span><b>Gast</b><small>ohne Passwort</small></button>
+      <button class="utile" data-u="owner"><span>🛡️</span><b>Benedikt</b><small>Owner · geschützt</small></button>
+      <button class="utile" data-u="other"><span>⌨</span><b>Anderer</b><small>Benutzer eingeben</small></button>
+    </div>
+    <form id="login-form" autocomplete="off" hidden>
+      <input class="field" id="lu" aria-label="Benutzername" placeholder="Benutzername" spellcheck="false">
+      <input class="field" id="lp" type="password" aria-label="Passwort" placeholder="Passwort">
+      <div class="opbar" style="justify-content:center"><button class="btn" type="submit">Anmelden ▶</button><button class="btn" type="button" id="lback">Zurück</button></div>
     </form>
+    <div id="lauth" hidden><pre id="lauth-log"></pre><div class="bar"><div id="lauth-bar"></div></div></div>
     <div id="lmsg" role="alert"></div>
-    <div class="dim" style="font-size:12px">Als <b>guest</b> ohne Passwort einloggen. Oder du versuchst dein Glück als Hacker 😉</div>
+    <div class="dim" id="lhint" style="font-size:12px"></div>
   </div>
 </div>
 
@@ -48,20 +62,24 @@
   <button id="badge" hidden aria-label="Zertifikate öffnen"></button>
   <div id="windows"></div>
 </main>
+<div id="snap" hidden></div>
 
 <div id="startmenu" hidden></div>
 
 <footer id="taskbar" hidden>
   <button id="start-btn">⏻ BENE<span>OS</span></button>
   <div id="tasks"></div>
-  <div id="tray"><span id="tray-net">◉ ONLINE</span><span id="clock"></span></div>
+  <div id="tray"><span id="tray-net">◉ ONLINE</span><button id="clock" aria-label="Kalender"></button></div>
 </footer>
 
 <noscript><p style="position:fixed;inset:0;display:grid;place-items:center;color:#00f0ff;background:#000;font-family:monospace">BeneOS braucht JavaScript.</p></noscript>
 <script src="repos-fallback.js"></script>
+<script src="wallpaper.js"></script>
 <script src="sounds.js"></script>
 <script src="lab.js"></script>
 <script src="lab2.js"></script>
 <script src="os.js"></script>
+<script src="login.js"></script>
+<script src="shell.js"></script>
 </body>
 </html>

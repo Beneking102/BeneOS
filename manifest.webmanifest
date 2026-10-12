@@ -1,0 +1,17 @@
+{
+  "name": "BeneOS",
+  "short_name": "BeneOS",
+  "description": "Cyber-themed browser OS portfolio of Benedikt Pankratz – every public GitHub repo is an app.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#05060d",
+  "theme_color": "#05060d",
+  "lang": "de",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
