@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BeneOS – Benedikt Pankratz</title>
+<meta name="description" content="BeneOS: das Browser-Betriebssystem von Benedikt Pankratz – Junior Cybersecurity Consultant (eWPTX). Jedes öffentliche GitHub-Repo ist eine App.">
+<meta name="theme-color" content="#05060d">
+<meta property="og:title" content="BeneOS – Cybersecurity Portfolio">
+<meta property="og:description" content="Ein Browser-OS im Cyber-Look mit Security-Lab, CTF und allen meinen GitHub-Repos als Apps.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2305060d'/%3E%3Cpath d='M16 3 5 7v8c0 7 5 12 11 14 6-2 11-7 11-14V7z' fill='none' stroke='%2300f0ff' stroke-width='2'/%3E%3Ctext x='16' y='21' font-size='13' font-family='monospace' font-weight='bold' fill='%23ff2bd6' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="matrix"></canvas>
+<div id="scanlines"></div>
+
+<div id="boot">
+  <pre id="boot-log"></pre>
+  <div id="boot-hint">Klicken zum Überspringen</div>
+</div>
+
+<div id="login" hidden>
+  <div class="lbox" id="lbox">
+    <div class="avatar">B</div>
+    <h1>BENE<span class="dim">OS</span></h1>
+    <form id="login-form" autocomplete="off">
+      <input class="field" id="lu" value="guest" aria-label="Benutzername" spellcheck="false">
+      <input class="field" id="lp" type="password" placeholder="Passwort (Gast: leer lassen)" aria-label="Passwort">
+      <button class="btn" style="width:100%">Anmelden ▶</button>
+    </form>
+    <div id="lmsg" role="alert"></div>
+    <div class="dim" style="font-size:12px">Als <b>guest</b> ohne Passwort einloggen. Oder du versuchst dein Glück als Hacker 😉</div>
+  </div>
+</div>
+
+<main id="desktop" hidden>
+  <div id="icons"></div>
+  <button id="badge" hidden aria-label="Zertifikate öffnen"></button>
+  <div id="windows"></div>
+</main>
+
+<div id="startmenu" hidden></div>
+
+<footer id="taskbar" hidden>
+  <button id="start-btn">⏻ BENE<span>OS</span></button>
+  <div id="tasks"></div>
+  <div id="tray"><span id="tray-net">◉ ONLINE</span><span id="clock"></span></div>
+</footer>
+
+<noscript><p style="position:fixed;inset:0;display:grid;place-items:center;color:#00f0ff;background:#000;font-family:monospace">BeneOS braucht JavaScript.</p></noscript>
+<script src="repos-fallback.js"></script>
+<script src="sounds.js"></script>
+<script src="lab.js"></script>
+<script src="lab2.js"></script>
+<script src="os.js"></script>
+</body>
+</html>
