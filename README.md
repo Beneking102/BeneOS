@@ -10,7 +10,7 @@
 
 **Desktop & Shell**
 - Window manager with drag, resize, minimize, maximize, **edge snapping**, close animations, taskbar dock and start menu with **search** (`Ctrl+K`).
-- **3 virtual desktops** (`Ctrl+Alt+1/2/3`) and a **window overview** (`Ctrl+Alt+O`) to move or close windows.
+- **3 virtual desktops with their own role** (`Ctrl+Alt+1/2/3`): *Portfolio* (profile, repos), *Security Lab* (tools, progress widget, green starfield) and *Fun & Tools* (games, highscore widget, synthwave). Each has its own icons, widgets, wallpaper and color scheme (changes are remembered per desktop), a slide animation and a name banner. A **window overview** (`Ctrl+Alt+O`) moves or closes windows across desktops.
 - **Login & lock screen** with account tiles, animated auth sequence and failed-attempt lockout.
 - **Control Center**, **notification history**, **calendar**, context menu, drag-and-drop **desktop icons** (order is saved), screensaver after 2 minutes idle.
 - Live **widgets**: clock, GitHub stats from the real API, simulated threat feed. Taskbar shows network and battery status.

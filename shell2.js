@@ -7,24 +7,62 @@
   const tray = $("#tray");
   const layer = (id, cls) => { const e = el("div", cls); e.id = id; e.hidden = true; document.body.append(e); return e; };
 
-  /* ---------- Virtuelle Desktops ---------- */
-  const WS_N = 3;
+  /* ---------- Virtuelle Desktops – jeder mit eigener Rolle, eigenem Look und eigenen Icons/Widgets ---------- */
+  const DESK = [
+    { n: "Portfolio", i: "👤", groups: ["System", "Dev Repos", "Security Repos"], def: null },
+    { n: "Security Lab", i: "🛡️", groups: ["Security Lab", "Security Repos"], def: { wallpaper: "stars", theme: "green" } },
+    { n: "Fun & Tools", i: "🎮", groups: ["Fun", "Tools"], def: { wallpaper: "grid", theme: "pink" } },
+  ];
+  const WS_N = DESK.length, ALWAYS = new Set(["terminal", "bot", "projects"]);
+  const WIDGET_DESKS = { wclock: [1, 2, 3], wgh: [1], wfeed: [1, 2], wsc: [2], whs: [3] };
+  const prefs = store.get("wsprefs", {});
+  let applying = false;
+  const _apply = window.applySettings;
+  const savePrefs = () => { prefs[CUR_WS] = { wallpaper: settings.wallpaper, accent: settings.accent, accent2: settings.accent2 }; store.set("wsprefs", prefs); };
+  window.applySettings = () => { _apply(); if (!applying) savePrefs(); };       // Look-Änderungen gelten für den aktuellen Desktop
+  const deskPrefs = n => {
+    const p = prefs[n], d = DESK[n - 1].def;
+    if (p && Wallpaper.modes.includes(p.wallpaper) && HEX.test(p.accent) && HEX.test(p.accent2)) return p;
+    return d ? { wallpaper: d.wallpaper, accent: THEME_NAMES[d.theme][0], accent2: THEME_NAMES[d.theme][1] } : null;
+  };
+  const applyDeskLook = n => { const p = deskPrefs(n); if (!p) return; applying = true; Object.assign(settings, p); _apply(); applying = false; };
+  const applyIcons = () => document.querySelectorAll("#icons .icon").forEach(b => {
+    const a = APPS[b.dataset.id];
+    b.classList.toggle("ws-hide", !(ALWAYS.has(b.dataset.id) || !a || DESK[CUR_WS - 1].groups.includes(a.group)));
+  });
+  const applyWidgets = () => { for (const [cls, ds] of Object.entries(WIDGET_DESKS)) { const w = $("#widgets ." + cls); if (w) w.classList.toggle("ws-hide", !ds.includes(CUR_WS)); } if (window.updateScoreWidgets) updateScoreWidgets(); };
+
   const wsBox = el("div", "wsbox");
   wsBox.setAttribute("role", "group"); wsBox.setAttribute("aria-label", "Virtuelle Desktops");
   const renderWs = () => {
-    wsBox.innerHTML = Array.from({ length: WS_N }, (_, i) => {
+    wsBox.innerHTML = DESK.map((d, i) => {
       const n = i + 1, cnt = Object.values(open).filter(e => e.win.dataset.ws == n).length;
-      return `<button class="wsb ${n === CUR_WS ? "on" : ""} ${cnt ? "has" : ""}" data-ws="${n}" title="Desktop ${n} (Strg+Alt+${n})">${n}</button>`;
+      return `<button class="wsb ${n === CUR_WS ? "on" : ""} ${cnt ? "has" : ""}" data-ws="${n}" title="Desktop ${n} · ${d.n} (Strg+Alt+${n})" aria-label="Desktop ${n}: ${d.n}">${d.i}</button>`;
     }).join("");
+  };
+  const banner = el("div"); banner.id = "wsbanner"; banner.hidden = true; document.body.append(banner);
+  let bt = 0;
+  const showBanner = n => {
+    banner.textContent = `${DESK[n - 1].i}  Desktop ${n} · ${DESK[n - 1].n}`; banner.hidden = false;
+    banner.classList.remove("show"); void banner.offsetWidth; banner.classList.add("show");
+    clearTimeout(bt); bt = setTimeout(() => { banner.hidden = true; }, 1500);
+  };
+  const slide = dir => {
+    const cls = dir > 0 ? "slide-r" : "slide-l";
+    const targets = [$("#icons"), $("#widgets"), ...Object.values(open).filter(e => e.win.dataset.ws == CUR_WS).map(e => e.win)];
+    targets.forEach(e => { if (!e) return; e.classList.remove("slide-r", "slide-l"); void e.offsetWidth; e.classList.add(cls); });
   };
   function setWs(n) {
     n = ((n - 1 + WS_N) % WS_N) + 1;
     if (n === CUR_WS) return;
+    const dir = n > CUR_WS ? 1 : -1;
+    savePrefs();                                   // Look des verlassenen Desktops merken
     CUR_WS = n;
     Object.values(open).forEach(e => { const off = e.win.dataset.ws != n; e.win.classList.toggle("ws-off", off); e.btn.hidden = off; });
     const vis = Object.keys(open).filter(k => open[k].win.dataset.ws == n && !open[k].win.classList.contains("hidden")).pop();
     if (vis) focusWin(vis);
-    updateOcclusion(); renderWs(); sfx("maximize"); achieve("ws");
+    applyDeskLook(n); applyIcons(); applyWidgets();
+    updateOcclusion(); renderWs(); slide(dir); showBanner(n); sfx("maximize"); achieve("ws");
   }
   function moveWs(id, n) {
     const e = open[id]; if (!e) return;
@@ -42,9 +80,9 @@
     ov.innerHTML = `<div class="ov-h"><b>Fenster-Übersicht</b><span class="dim">Klick = fokussieren · ✕ = schließen · Zahlen = auf Desktop verschieben · Esc = zurück</span></div><div class="ov-cols">` +
       Array.from({ length: WS_N }, (_, i) => {
         const n = i + 1, items = Object.entries(open).filter(([, e]) => e.win.dataset.ws == n);
-        return `<div class="ov-col ${n === CUR_WS ? "cur" : ""}"><button class="ov-title" data-ws="${n}">Desktop ${n}${n === CUR_WS ? " · aktiv" : ""}</button>` +
+        return `<div class="ov-col ${n === CUR_WS ? "cur" : ""}"><button class="ov-title" data-ws="${n}">${DESK[n - 1].i} Desktop ${n} · ${DESK[n - 1].n}${n === CUR_WS ? " · aktiv" : ""}</button>` +
           (items.map(([id, e]) => `<div class="ov-tile" data-id="${esc(id)}"><span class="ov-i">${esc(APPS[id].icon)}</span><div><b>${esc(APPS[id].title)}</b><small>${e.win.classList.contains("hidden") ? "minimiert" : e.win.classList.contains("active") ? "aktiv" : "läuft"}</small></div>
-            <span class="ov-mv">${Array.from({ length: WS_N }, (_, k) => k + 1).filter(k => k !== n).map(k => `<button data-mv="${esc(id)}|${k}" title="Auf Desktop ${k}">${k}</button>`).join("")}<button data-x="${esc(id)}" title="Schließen">✕</button></span></div>`).join("") || `<div class="dim" style="padding:14px">Keine Fenster</div>`) + `</div>`;
+            <span class="ov-mv">${Array.from({ length: WS_N }, (_, k) => k + 1).filter(k => k !== n).map(k => `<button data-mv="${esc(id)}|${k}" title="Auf Desktop ${k} · ${DESK[k - 1].n}">${k}</button>`).join("")}<button data-x="${esc(id)}" title="Schließen">✕</button></span></div>`).join("") || `<div class="dim" style="padding:14px">Keine Fenster</div>`) + `</div>`;
       }).join("") + `</div>`;
   };
   const toggleOv = show => {
@@ -91,7 +129,7 @@
     [...icons.children].sort((a, b) => idx(a.dataset.id) - idx(b.dataset.id)).forEach(k => icons.append(k));
   };
   const origAdd = window.addIcon;
-  window.addIcon = id => { origAdd(id); applyOrder(); };
+  window.addIcon = id => { origAdd(id); applyOrder(); applyIcons(); };
   icons.querySelectorAll(".icon").forEach(b => { b.draggable = true; });
   let dragEl = null;
   icons.addEventListener("dragstart", e => {
@@ -172,7 +210,7 @@
     b64: (a, args) => ct(btoa(String.fromCharCode(...new TextEncoder().encode(args.join(" "))))),
     unb64: (a, args) => { try { return esc(new TextDecoder().decode(Uint8Array.from(atob(args.join("")), c => c.charCodeAt(0)))); } catch { return "<span class='err'>Kein gültiges Base64</span>"; } },
     rev: (a, args) => esc([...args.join(" ")].reverse().join("")),
-    ws: a => { if (!/^[1-3]$/.test(a || "")) return "Nutzung: ws 1|2|3"; setWs(+a); return `<span class="ok">Desktop ${a}</span>`; },
+    ws: a => { if (!/^[1-3]$/.test(a || "")) return `Nutzung: ws 1|2|3  (${DESK.map((d, i) => `${i + 1} = ${d.n}`).join(", ")})`; setWs(+a); return `<span class="ok">Desktop ${a} · ${DESK[a - 1].n}</span>`; },
     overview: () => { toggleOv(true); return null; },
     radio: () => { openApp("radio"); return null; },
     play: () => { openApp("radio"); return null; },
@@ -234,6 +272,25 @@
   };
   for (let i = 0; i < 4; i++) feedTick();
   setInterval(feedTick, 3200);
+
+  /* ---------- Desktop-spezifische Widgets: Fortschritt (Security Lab) und Highscores (Fun & Tools) ---------- */
+  const wsc = el("div", "widget wsc"), whs = el("div", "widget whs");
+  wid.append(wsc, whs);
+  const meter = (v, max) => `<div class="bar" style="height:6px;margin:3px 0 9px"><div style="width:${max ? Math.min(100, v / max * 100) : 0}%"></div></div>`;
+  window.updateScoreWidgets = () => {
+    if (CUR_WS === 2) {
+      const f = store.get("ctf", []).length, a = store.get("ach", []).length, tot = Object.keys(ACH).length;
+      wsc.innerHTML = `<div class="wgh-h">🚩 Dein Fortschritt</div><div class="hsrow"><span>CTF-Flags</span><b>${f}/9</b></div>${meter(f, 9)}<div class="hsrow"><span>Erfolge</span><b>${a}/${tot}</b></div>${meter(a, tot)}<button class="chip" data-open="ctf">🚩 Zum CTF</button> <button class="chip" data-open="achievements">🏆 Erfolge</button>`;
+    } else if (CUR_WS === 3) {
+      const g = k => store.get("hs-" + k, 0);
+      const rows = [["🐍 Snake", Math.max(g("snake-wall"), g("snake-wrap"))], ["🧱 Tetris", g("tetris")], ["🛡 Defender", g("defender")], ["🎣 Phish", g("phish")], ["⌨ Typing", g("typing") ? g("typing") + " WPM" : 0], ["💣 Minesweeper", g("mines-easy") ? g("mines-easy") + " s" : 0]];
+      whs.innerHTML = `<div class="wgh-h">🏆 Highscores</div>` + rows.map(([k, v]) => `<div class="hsrow"><span>${k}</span><b>${v || "–"}</b></div>`).join("");
+    }
+  };
+  setInterval(() => { if (!document.hidden && CUR_WS > 1) updateScoreWidgets(); }, 3000);
+  document.addEventListener("repos", applyIcons);
+  { const p = deskPrefs(1); if (p) { applying = true; Object.assign(settings, p); _apply(); applying = false; } }   // gespeicherter Look von Desktop 1
+  applyIcons(); applyWidgets();
 
   /* ---------- Gelegentliche Tipps ---------- */
   let tipsShown = 0;
