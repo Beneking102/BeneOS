@@ -125,7 +125,7 @@ window.EXTRA_APPS = window.EXTRA_APPS || {};
         if (mem) line(heapH, Math.max(...heapH) * 1.2 || 1, settings.accent2);
         const rows = Object.entries(open).map(([id, e]) => {
           const hidden = e.win.classList.contains("hidden"), nodes = e.win.getElementsByTagName("*").length;
-          return `<tr><td>${esc(APPS[id].icon)} ${esc(APPS[id].title)}</td><td>${hidden ? "minimiert" : e.win.classList.contains("active") ? "aktiv" : "läuft"}</td><td>${e.win.dataset.ws ? "Desktop " + e.win.dataset.ws : "–"}</td><td>${nodes}</td><td><button class="btn" data-kill="${esc(id)}">Beenden</button></td></tr>`;
+          return `<tr><td>${iconHTML(id)} ${esc(APPS[id].title)}</td><td>${hidden ? "minimiert" : e.win.classList.contains("active") ? "aktiv" : "läuft"}</td><td>${e.win.dataset.ws ? "Desktop " + e.win.dataset.ws : "–"}</td><td>${nodes}</td><td><button class="btn" data-kill="${esc(id)}">Beenden</button></td></tr>`;
         });
         $("#st", body).innerHTML = `<tr><th>Name</th><th>Status</th><th>Desktop</th><th>DOM-Knoten</th><th></th></tr>${rows.join("")}`;
       };

@@ -703,3 +703,29 @@ body.mobile .icon.ws-hide { display: flex; }
 body.lite .slide-r, body.lite .slide-l { animation: none !important; }
 .hsrow { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; padding: 2px 0; } .hsrow b { color: var(--accent); }
 .wsc .chip, .whs .chip { margin-top: 4px; }
+
+/* ===== v11: Einheitliches Icon-Set, exakt zentriert ===== */
+.ico { display: block; width: 24px; height: 24px; flex: none; fill: none; stroke: var(--accent); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
+.ico .a2 { stroke: var(--accent2); }
+.ico .fl { fill: color-mix(in srgb, var(--accent2) 30%, transparent); stroke: var(--accent2); }
+/* Desktop-Kacheln */
+.icon i { display: grid; place-items: center; font-size: 0; line-height: 0; }
+.icon i .ico { width: 30px; height: 30px; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 50%, transparent)); }
+.icon.sec i .ico { stroke: var(--accent2); }
+.icon.sec i .ico .a2 { stroke: var(--accent); } .icon.sec i .ico .fl { fill: color-mix(in srgb, var(--accent) 30%, transparent); stroke: var(--accent); }
+.icon:hover i .ico { filter: drop-shadow(0 0 9px var(--accent)); }
+body.mobile .icon i { font-size: 0; } body.mobile .icon i .ico { width: 31px; height: 31px; }
+/* Titelleiste, Taskleiste, Startmenü, Übersicht, Tray, Tabellen */
+.titlebar .tb-ico { display: grid; place-items: center; width: 22px; } .titlebar .ico { width: 17px; height: 17px; }
+.task { display: flex; align-items: center; gap: 8px; } .task .ico { width: 17px; height: 17px; } .task span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+body.mobile .task.active { display: flex; }
+#startmenu button > span { display: grid; place-items: center; width: 28px; height: 22px; } #startmenu button > span .ico { width: 20px; height: 20px; }
+.ov-i { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: rgba(255,255,255,.05); } .ov-i .ico { width: 20px; height: 20px; }
+.tbtn { display: grid; place-items: center; } .tbtn .ico { width: 20px; height: 20px; } .tbtn:hover .ico { filter: drop-shadow(0 0 5px var(--accent)); }
+.wsb { display: grid; place-items: center; padding: 0; } .wsb .ico { width: 15px; height: 15px; stroke: var(--dim); } .wsb.on .ico { stroke: var(--accent); }
+.tbl td .ico { display: inline-block; width: 16px; height: 16px; vertical-align: -3px; margin-right: 4px; }
+.h-ico { display: flex; align-items: center; gap: 10px; } .h-ico .ico { width: 24px; height: 24px; }
+.card h3.h-ico .ico { width: 20px; height: 20px; }
+
+.chip .ico, .btn .ico { display: inline-block; width: 15px; height: 15px; vertical-align: -3px; margin-right: 6px; }
+.mh-chips .chip { display: inline-flex; align-items: center; }

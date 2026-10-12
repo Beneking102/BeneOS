@@ -37,7 +37,7 @@
   const renderWs = () => {
     wsBox.innerHTML = DESK.map((d, i) => {
       const n = i + 1, cnt = Object.values(open).filter(e => e.win.dataset.ws == n).length;
-      return `<button class="wsb ${n === CUR_WS ? "on" : ""} ${cnt ? "has" : ""}" data-ws="${n}" title="Desktop ${n} · ${d.n} (Strg+Alt+${n})" aria-label="Desktop ${n}: ${d.n}">${d.i}</button>`;
+      return `<button class="wsb ${n === CUR_WS ? "on" : ""} ${cnt ? "has" : ""}" data-ws="${n}" title="Desktop ${n} · ${d.n} (Strg+Alt+${n})" aria-label="Desktop ${n}: ${d.n}">${iconSvg(["about", "shield", "gamepad"][i])}</button>`;
     }).join("");
   };
   const banner = el("div"); banner.id = "wsbanner"; banner.hidden = true; document.body.append(banner);
@@ -81,7 +81,7 @@
       Array.from({ length: WS_N }, (_, i) => {
         const n = i + 1, items = Object.entries(open).filter(([, e]) => e.win.dataset.ws == n);
         return `<div class="ov-col ${n === CUR_WS ? "cur" : ""}"><button class="ov-title" data-ws="${n}">${DESK[n - 1].i} Desktop ${n} · ${DESK[n - 1].n}${n === CUR_WS ? " · aktiv" : ""}</button>` +
-          (items.map(([id, e]) => `<div class="ov-tile" data-id="${esc(id)}"><span class="ov-i">${esc(APPS[id].icon)}</span><div><b>${esc(APPS[id].title)}</b><small>${e.win.classList.contains("hidden") ? "minimiert" : e.win.classList.contains("active") ? "aktiv" : "läuft"}</small></div>
+          (items.map(([id, e]) => `<div class="ov-tile" data-id="${esc(id)}"><span class="ov-i">${iconHTML(id)}</span><div><b>${esc(APPS[id].title)}</b><small>${e.win.classList.contains("hidden") ? "minimiert" : e.win.classList.contains("active") ? "aktiv" : "läuft"}</small></div>
             <span class="ov-mv">${Array.from({ length: WS_N }, (_, k) => k + 1).filter(k => k !== n).map(k => `<button data-mv="${esc(id)}|${k}" title="Auf Desktop ${k} · ${DESK[k - 1].n}">${k}</button>`).join("")}<button data-x="${esc(id)}" title="Schließen">✕</button></span></div>`).join("") || `<div class="dim" style="padding:14px">Keine Fenster</div>`) + `</div>`;
       }).join("") + `</div>`;
   };
@@ -99,9 +99,9 @@
     if (t === ov || t.classList.contains("ov-cols")) ov.hidden = true;
   });
   Object.assign(window, { setWs, moveWs, toggleOv });   // auch für Terminal/BeneBot nutzbar
-  const ovBtn = el("button", "tbtn", "▦"); ovBtn.title = "Fenster-Übersicht (Strg+Alt+O)"; ovBtn.setAttribute("aria-label", "Fenster-Übersicht");
+  const ovBtn = el("button", "tbtn", iconSvg("overview")); ovBtn.title = "Fenster-Übersicht (Strg+Alt+O)"; ovBtn.setAttribute("aria-label", "Fenster-Übersicht");
   ovBtn.onclick = e => { e.stopPropagation(); toggleOv(); };
-  const botBtn = el("button", "tbtn", "🤖"); botBtn.title = "BeneBot"; botBtn.setAttribute("aria-label", "BeneBot öffnen");
+  const botBtn = el("button", "tbtn", iconSvg("bot")); botBtn.title = "BeneBot"; botBtn.setAttribute("aria-label", "BeneBot öffnen");
   botBtn.onclick = e => { e.stopPropagation(); openApp("bot"); };
   tray.prepend(wsBox, botBtn, ovBtn);
 

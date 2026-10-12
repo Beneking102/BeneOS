@@ -36,8 +36,8 @@
 
   /* ---------- Tray: Benachrichtigungen + Schnelleinstellungen + Kalender ---------- */
   const tray = $("#tray");
-  const bell = el("button", "tbtn", "🔔<i hidden></i>"); bell.title = "Benachrichtigungen"; bell.setAttribute("aria-label", "Benachrichtigungen");
-  const cbtn = el("button", "tbtn", "🎛"); cbtn.title = "Schnelleinstellungen"; cbtn.setAttribute("aria-label", "Schnelleinstellungen");
+  const bell = el("button", "tbtn", iconSvg("bell") + "<i hidden></i>"); bell.title = "Benachrichtigungen"; bell.setAttribute("aria-label", "Benachrichtigungen");
+  const cbtn = el("button", "tbtn", iconSvg("sliders")); cbtn.title = "Schnelleinstellungen"; cbtn.setAttribute("aria-label", "Schnelleinstellungen");
   tray.prepend(bell, cbtn);
   let unread = 0;
   const updateBell = () => { const i = $("i", bell); i.textContent = unread > 9 ? "9+" : String(unread || ""); i.hidden = !unread; };

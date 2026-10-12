@@ -14,7 +14,7 @@
   const home = el("div"); home.id = "mhome";
   home.innerHTML = `<div class="mh-time"><b></b><span></span></div>
     <input class="field" id="msearch" placeholder="Apps &amp; Repos suchen …" autocomplete="off" spellcheck="false" aria-label="Apps suchen">
-    <div class="mh-chips">${[["about", "👤 Über mich"], ["bot", "🤖 BeneBot"], ["terminal", "⌨ Terminal"], ["ctf", "🚩 CTF"], ["report", "📝 Report"]].map(([id, t]) => `<button class="chip" data-open="${id}">${t}</button>`).join("")}</div>`;
+    <div class="mh-chips">${[["about", "Über mich"], ["bot", "BeneBot"], ["terminal", "Terminal"], ["ctf", "CTF"], ["report", "Report"]].map(([id, t]) => `<button class="chip" data-open="${id}">${iconHTML(id)}${t}</button>`).join("")}</div>`;
   $("#desktop").insertBefore(home, $("#icons"));
   const tick = () => {
     const d = new Date();

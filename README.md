@@ -14,6 +14,7 @@
 - **Login & lock screen** with account tiles, animated auth sequence and failed-attempt lockout.
 - **Control Center**, **notification history**, **calendar**, context menu, drag-and-drop **desktop icons** (order is saved), screensaver after 2 minutes idle.
 - Live **widgets**: clock, GitHub stats from the real API, simulated threat feed. Taskbar shows network and battery status.
+- **Unified SVG icon set** (42 duotone line icons) for desktop, dock, start menu, window titles and tray – centered to the pixel and automatically recolored by each desktop's theme.
 - **5 live wallpapers** (Matrix, Synthwave, starfield, aurora, off) and 8 color schemes.
 - Retro-style **sounds** synthesized with the Web Audio API (no audio files). Installable **PWA**.
 

@@ -133,11 +133,11 @@ function openApp(id) {
   const w = Math.min(app.w, innerWidth - 20), h = Math.min(app.h, innerHeight - 64);
   const off = (cascade++ % 6) * 26;
   win.style.cssText = `width:${w}px;height:${h}px;left:${Math.max(0, (innerWidth - w) / 2 - 80 + off)}px;top:${Math.max(0, (innerHeight - 44 - h) / 2 - 40 + off)}px`;
-  win.innerHTML = `<div class="titlebar"><span>${app.icon}</span><b>${esc(app.title)}</b><button class="mn" title="Minimieren">—</button><button class="mx" title="Maximieren">▢</button><button class="x" title="Schließen">✕</button></div><div class="wbody"></div>`;
+  win.innerHTML = `<div class="titlebar"><span class="tb-ico">${iconHTML(id)}</span><b>${esc(app.title)}</b><button class="mn" title="Minimieren">—</button><button class="mx" title="Maximieren">▢</button><button class="x" title="Schließen">✕</button></div><div class="wbody"></div>`;
   winLayer.append(win);
 
-  const btn = el("button", "task");
-  btn.textContent = `${app.icon} ${app.title}`;
+  const btn = el("button", "task", `${iconHTML(id)}<span></span>`);
+  $("span", btn).textContent = app.title;
   win.dataset.ws = CUR_WS; btn.dataset.ws = CUR_WS;
   tasks.append(btn);
   const entry = { win, btn, cleanup: null };
@@ -253,7 +253,7 @@ function repoApp(r) {
     title: r.name, icon: repoIcon(r), group: isSec(r) ? "Security Repos" : "Dev Repos", sec: isSec(r), w: 580, h: 480,
     render(body) {
       const demo = safeUrl(r.homepage);
-      body.innerHTML = `<div class="pad"><h1>${repoIcon(r)} ${esc(r.name)}</h1>
+      body.innerHTML = `<div class="pad"><h1 class="h-ico">${iconByEmoji(repoIcon(r))} ${esc(r.name)}</h1>
         <div class="dim">${esc(r.language || "–")} · ★ ${r.stargazers_count} · zuletzt aktualisiert ${esc((r.pushed_at || "").slice(0, 10))}</div>
         <p>${esc(r.description || "Keine Beschreibung.")}</p>
         <div>${(r.topics || []).map(t => `<span class="tag">${esc(t)}</span>`).join("")}</div>
@@ -281,7 +281,7 @@ const APPS = {
           <div style="flex:1;min-width:200px"><h1>${esc(PROFILE.name)}</h1><div class="dim">${esc(PROFILE.tagline)}</div><div class="dim">📍 ${esc(PROFILE.location)}</div>
           <div style="margin-top:6px">${(PROFILE.certs || []).map(c => `<button class="tag" data-open="certs" style="cursor:pointer">🏅 ${esc(c.short)}</button>`).join("")}</div></div></div>
           <p>${esc(PROFILE.bio)}</p>
-          <div class="opbar"><button class="btn" data-open="projects">📁 Repos</button><button class="btn" data-open="certs">🏅 Zertifikate</button><button class="btn" data-open="ctf">🚩 CTF</button><button class="btn" data-open="terminal">⌨ Terminal</button><button class="btn" data-open="contact">✉ Kontakt</button></div>
+          <div class="opbar">${[["projects", "Repos"], ["certs", "Zertifikate"], ["ctf", "CTF"], ["terminal", "Terminal"], ["contact", "Kontakt"]].map(([id, t]) => `<button class="btn" data-open="${id}">${iconHTML(id)}${t}</button>`).join("")}</div>
           <h2>Skills</h2>${PROFILE.skills.map(([n, v]) => `<div>${esc(n)} <span class="dim">${v}%</span></div><div class="bar"><div style="width:${v}%"></div></div>`).join("")}`,
         highlights: () => `<div class="cards">${(PROFILE.highlights || []).map(h => `<div class="card"><h3>${esc(h.name)}</h3><p>${esc(h.desc)}</p>${h.tags.map(t => `<span class="tag">${esc(t)}</span>`).join("")}${safeUrl(h.url) ? `<div style="margin-top:8px"><a href="${esc(safeUrl(h.url))}" target="_blank" rel="noopener noreferrer">→ ansehen</a></div>` : ""}</div>`).join("")}</div>`,
         stack: () => Object.entries(PROFILE.stack || {}).map(([k, v]) => `<h2>${esc(k)}</h2><div>${v.map(t => `<span class="tag">${esc(t)}</span>`).join("")}</div>`).join(""),
@@ -299,7 +299,7 @@ const APPS = {
     render(body) {
       body.innerHTML = `<div class="pad"><h1>Repo Explorer</h1><div class="dim">${REPOS.length} öffentliche Repos von ${esc(PROFILE.user)} · ${repoSource}</div>
         <h2>Live-Projekte</h2><div class="cards">${(PROFILE.live || []).map(l => `<a class="card" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><h3>🌐 ${esc(l.name)}</h3><p>${esc(l.desc)}</p></a>`).join("")}</div>
-        <h2>GitHub-Repos</h2><div class="cards">${REPOS.map(r => `<button class="card ${isSec(r) ? "sec" : ""}" data-repo="${esc(r.name)}" style="text-align:left"><h3>${repoIcon(r)} ${esc(r.name)}</h3>
+        <h2>GitHub-Repos</h2><div class="cards">${REPOS.map(r => `<button class="card ${isSec(r) ? "sec" : ""}" data-repo="${esc(r.name)}" style="text-align:left"><h3 class="h-ico">${iconByEmoji(repoIcon(r))} ${esc(r.name)}</h3>
         <p>${esc(r.description || "Keine Beschreibung")}</p>${r.language ? `<span class="tag">${esc(r.language)}</span>` : ""}${isSec(r) ? `<span class="tag">security</span>` : ""}</button>`).join("") || "<p class='dim'>Lade Repos…</p>"}</div></div>`;
       body.onclick = e => { const c = e.target.closest("[data-repo]"); if (c) openApp("repo:" + c.dataset.repo); };
     },
@@ -576,7 +576,7 @@ Object.values(APPS).forEach(a => { a.group ||= "System"; });
 const iconBox = $("#icons");
 function addIcon(id) {
   const a = APPS[id];
-  const b = el("button", "icon" + (a.sec ? " sec" : ""), `<i>${a.icon}</i><span></span>`);
+  const b = el("button", "icon" + (a.sec ? " sec" : ""), `<i>${iconHTML(id)}</i><span></span>`);
   b.dataset.id = id; b.draggable = true;
   $("span", b).textContent = a.title;
   b.title = a.title;
@@ -595,7 +595,7 @@ function buildStart() {
   start.innerHTML = `<header><div class="who"><span class="avatar sm">${esc(PROFILE.name[0])}</span><div><b>${esc(PROFILE.name)}</b><div class="dim">${esc(session.user)}@beneos</div></div></div>
     <input id="ssearch" class="field" placeholder="Apps &amp; Repos suchen …" autocomplete="off" spellcheck="false" aria-label="Suchen"></header>
     <div class="slist">` +
-    order.filter(g => groups[g]).map(g => `<div class="grp">${g}</div>` + groups[g].map(id => `<button data-app="${esc(id)}"><span>${APPS[id].icon}</span><b></b></button>`).join("")).join("") +
+    order.filter(g => groups[g]).map(g => `<div class="grp">${g}</div>` + groups[g].map(id => `<button data-app="${esc(id)}"><span>${iconHTML(id)}</span><b></b></button>`).join("")).join("") +
     `<div class="dim" id="snone" hidden style="padding:12px 16px">Nichts gefunden.</div></div>
     <div class="sfoot"><button data-act="lock"><span>🔒</span>Sperren</button><button data-act="off"><span>⏻</span>Herunterfahren</button></div>`;
   start.querySelectorAll("[data-app]").forEach(b => { $("b", b).textContent = APPS[b.dataset.app].title; });
