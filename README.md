@@ -54,12 +54,14 @@
 - `apps1.js` → calculator, paint · `games.js` → mini games · `report.js` → pentest report generator · `mobile.js` → mobile mode · `tools.js` → toolbox, DNS lab, vault · `live.js` → globe, task manager, radio, BeneBot.
 - `wallpaper.js` → background engine · `sounds.js` → sound effects · `sw.js` → service worker.
 
-Run locally: open `index.html`, or `npx serve .`
+Run locally: open `index.html`, or `npx serve .` (no build needed for local use).
 
 ## Deploy (Netlify)
 
-`netlify.toml` configures everything: publish directory, security headers (CSP, HSTS, X-Frame-Options, …) and a build step
-(`scripts/update-repos.mjs`) that refreshes the offline repo snapshot on every deploy.
+`netlify.toml` configures everything: security headers (CSP, HSTS, X-Frame-Options, …) and the build
+(`scripts/update-repos.mjs` refreshes the offline repo snapshot, `scripts/build.mjs` writes `dist/` and adds a content hash to every JS/CSS URL, e.g. `style.css?v=500e089d5f`).
+The hashes make cache mix-ups impossible – important behind CDNs/proxies (like Cloudflare) that cache static files for hours and ignore cache headers.
+Manual deploy: `node scripts/build.mjs && npx netlify-cli deploy --prod --dir dist`.
 
 **Auto-deploy via GitHub Actions** (`.github/workflows/deploy.yml`): deploys on every push to `main` and once a day.
 Add two repository secrets: `NETLIFY_SITE_ID` and `NETLIFY_AUTH_TOKEN` (Netlify → User settings → Applications → Personal access tokens).

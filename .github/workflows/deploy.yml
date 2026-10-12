@@ -44,11 +44,11 @@ jobs:
         if: steps.gate.outputs.skip != 'true'
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: node scripts/update-repos.mjs
+        run: node scripts/update-repos.mjs && node scripts/build.mjs
 
       - name: Zu Netlify deployen
         if: steps.gate.outputs.skip != 'true'
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: npx --yes netlify-cli@27.12.0 deploy --prod --dir . --message "GitHub Actions ${{ github.sha }}"
+        run: npx --yes netlify-cli@27.12.0 deploy --prod --dir dist --message "GitHub Actions ${{ github.sha }}"

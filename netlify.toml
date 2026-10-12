@@ -2,8 +2,8 @@
 # Beim Deploy wird der Repo-Snapshot (repos-fallback.js) frisch von GitHub geholt.
 # Schlägt das fehl (z. B. API-Limit), bleibt der letzte Snapshot erhalten – der Build bricht nicht ab.
 [build]
-  command = "node scripts/update-repos.mjs"
-  publish = "."
+  command = "node scripts/update-repos.mjs && node scripts/build.mjs"
+  publish = "dist"
 
 [[headers]]
   for = "/*"
@@ -16,15 +16,16 @@
     Cross-Origin-Opener-Policy = "same-origin"
     Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api.github.com https://cloudflare-dns.com; worker-src 'self'; manifest-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
 
+# JS/CSS werden über Content-Hash-URLs (?v=…) ausgeliefert -> dürfen lange gecacht werden, ohne dass je Altes mit Neuem gemischt wird.
 [[headers]]
   for = "/*.js"
   [headers.values]
-    Cache-Control = "public, max-age=300, must-revalidate"
+    Cache-Control = "public, max-age=3600, must-revalidate"
 
 [[headers]]
   for = "/*.css"
   [headers.values]
-    Cache-Control = "public, max-age=300, must-revalidate"
+    Cache-Control = "public, max-age=3600, must-revalidate"
 
 [[headers]]
   for = "/sw.js"

@@ -672,3 +672,19 @@ body.mobile .gm-foot { display: none; }
 @container (max-width: 640px) { .rp-split { grid-template-columns: minmax(0, 1fr); } .rp-side { position: static; } .rp-cv-g { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 body.mobile .rp-split { grid-template-columns: minmax(0, 1fr); }
 body.mobile .win { background: #070a16 !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+
+/* ===== v9: Lesbarkeit – Fenster blickdicht, nichts scheint mehr durch ===== */
+:root { --glass: #0b0f1e; }
+.win { background: linear-gradient(180deg, #0e1428 0%, #090c1a 100%); backdrop-filter: none; -webkit-backdrop-filter: none; }
+.win:not(.active) { opacity: 1; filter: none; box-shadow: 0 10px 28px rgba(0,0,0,.55); }
+.win:not(.active) .titlebar { background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.01)); }
+.win.dragging { background: #0b0f1e; }
+.panel, .menu, #startmenu { background: rgba(9, 12, 26, .97); }
+#taskbar { background: rgba(7, 10, 22, .94); }
+.toast, .lbox { background: rgba(9, 12, 26, .96); }
+.widget { background: rgba(8, 11, 24, .78); }
+canvas.game { background: #04060e; }
+body.mobile .win { background: #080b18 !important; }
+/* Text immer gut lesbar */
+.dim { color: #8da2bc; }
+.wbody, .pad { color: var(--text); }
