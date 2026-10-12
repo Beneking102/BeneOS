@@ -48,7 +48,7 @@
         <button class="tile ${settings.sound ? "on" : ""}" data-t="sound"><span>${settings.sound ? "🔊" : "🔇"}</span>Sound</button>
         <button class="tile ${settings.lite ? "on" : ""}" data-t="lite"><span>⚡</span>Performance</button>
         <button class="tile ${settings.crt ? "on" : ""}" data-t="crt"><span>📺</span>CRT</button>
-        <button class="tile" data-t="lock"><span>🔒</span>Sperren</button></div>
+        <button class="tile" data-t="lock"><span>🔒</span>Sperren</button>${window.__installEvt ? `<button class="tile" data-t="install"><span>📲</span>Installieren</button>` : ""}</div>
       <label class="chk">🔈 <input type="range" id="cc-vol" min="0" max="100" value="${Math.round(settings.volume * 100)}" style="flex:1" aria-label="Lautstärke"></label>
       <div class="dim cc-h">Hintergrund</div>
       <div class="chips">${Wallpaper.modes.map(m => `<button class="chip ${m === settings.wallpaper ? "on" : ""}" data-wp="${m}">${Wallpaper.labels[m]}</button>`).join("")}</div>
@@ -64,6 +64,7 @@
     else if (d.t === "lite") settings.lite = !settings.lite;
     else if (d.t === "crt") settings.crt = !settings.crt;
     else if (d.t === "lock") { hideAll(); lockScreen(); return; }
+    else if (d.t === "install") { hideAll(); window.installPWA(); return; }
     else if (d.t === "clear") { notifications.length = 0; unread = 0; updateBell(); }
     else if (d.wp) { settings.wallpaper = d.wp; achieve("wallpaper"); }
     else if (d.a) { settings.accent = d.a; settings.accent2 = d.b; achieve("theme"); }

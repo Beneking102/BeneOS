@@ -19,21 +19,27 @@
 
 **Portfolio**
 - **Every public GitHub repo is an app** – loaded live from the GitHub API, with an offline snapshot as fallback.
-- Profile with tabs (profile, highlights, tech stack), certificates (eWPTX), file explorer, 35 achievements.
+- Profile with tabs (profile, highlights, tech stack), certificates (eWPTX), file explorer, 36 achievements.
 - **BeneBot**: rule-based assistant that answers questions about the portfolio, opens apps, changes settings and gives CTF hints (no cloud AI, runs locally).
 
 **Security Lab**
 - **Security Toolbox**: JWT decoder, hash identifier, secure password generator, IPv4 subnet calculator, Unix-time converter.
 - **DNS Lab**: real DNS-over-HTTPS queries (Cloudflare) and a mail-security check (SPF, DMARC, DKIM).
 - **Vault**: AES-256-GCM encrypted note (PBKDF2, 250k iterations), stored only in your browser.
+- **Pentest Report Generator**: CVSS 3.1 calculator, 12 finding templates (CWE / OWASP mapped), automatic management summary, severity chart, export to Markdown, standalone HTML and PDF (print), JSON backup/import. Autosave in the browser, example report included.
 - Cipher Lab, Password Lab, Hash Breaker, Log Hunter, Packet Defender, Phish or Legit?, **Cyber Globe** (simulated attack map).
 - **Mini CTF** with 9 flags hidden across the OS (login screen, terminal, file system, DevTools console, a cheat code …).
 - Terminal with `dig` (real DNS), `nmap` (simulated), `sha256`, `top`, `kill`, `ws`, `ping`, tab completion and more.
 
 **Tools & Fun**
 - Calculator (with programmer mode and bit toggles), PixelLab (paint), **Task Manager** with real metrics (FPS, JS heap, DOM nodes, network, battery).
-- Minesweeper, Tetris, Snake, Hacker Typing, **Synthwave Radio** (generative music with visualizer).
+- Minesweeper (3 difficulties), Tetris (hold, next queue, ghost piece), Snake (wrap mode, golden packets), Packet Defender (combos, EMP), Hacker Typing, Phish or Legit? (timed mode) – all with a shared game UI: HUD, start / pause / game-over screens, high scores and touch controls.
+- **Synthwave Radio** (generative music with visualizer).
 - And a few secrets to find …
+
+**Mobile**
+- Dedicated mobile mode: home screen with clock and app search, one app at a time in full screen, ⌂ button and the device back button return home, bottom-sheet start menu, touch controls for games, terminal key bar, keyboard and safe-area handling.
+- Installable as an app (PWA) on phones.
 
 **Performance**
 - Background pauses when the tab is hidden, a window covers the screen, or the screensaver runs.
@@ -43,9 +49,9 @@
 ## Customize
 
 - `os.js` → `PROFILE` block at the top: name, bio, skills, certificates (date / credential ID / verify link), live projects, links.
-- `lab.js`, `lab2.js` → Security Lab apps, achievements and file explorer.
+- `lab.js`, `lab2.js` → Security Lab apps,36 achievements and file explorer.
 - `shell.js`, `shell2.js` → control center, widgets, screensaver, virtual desktops, overview, terminal extensions, easter eggs · `login.js` → login & lock screen.
-- `apps1.js` → calculator, paint, games · `tools.js` → toolbox, DNS lab, vault · `live.js` → globe, task manager, radio, BeneBot.
+- `apps1.js` → calculator, paint · `games.js` → mini games · `report.js` → pentest report generator · `mobile.js` → mobile mode · `tools.js` → toolbox, DNS lab, vault · `live.js` → globe, task manager, radio, BeneBot.
 - `wallpaper.js` → background engine · `sounds.js` → sound effects · `sw.js` → service worker.
 
 Run locally: open `index.html`, or `npx serve .`

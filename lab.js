@@ -132,7 +132,7 @@ window.EXTRA_APPS.loghunter = {
     const log = $("#log", body), flt = $("#flt", body), cnt = $("#cnt", body), msg = $("#msg", body);
     const show = () => {
       const q = flt.value.toLowerCase(), l = R.lines.filter(x => x.toLowerCase().includes(q));
-      log.textContent = l.join("\n"); cnt.textContent = `${l.length} von ${R.lines.length} Zeilen`;
+      log.innerHTML = l.map(x => `<span class="${/Failed|Invalid/.test(x) ? "ll-bad" : /Accepted/.test(x) ? "ll-ok" : /sudo|session opened/.test(x) ? "ll-warn" : ""}">${esc(x)}</span>`).join("\n"); cnt.textContent = `${l.length} von ${R.lines.length} Zeilen`;
     };
     flt.oninput = show; show();
     $("#ans", body).onsubmit = e => {
@@ -146,73 +146,5 @@ window.EXTRA_APPS.loghunter = {
         msg.append(n);
       } else sfx("error"), msg.innerHTML = `<b style="color:#ff5470">Nicht ganz.</b> <span class="dim">Tipp: Suche nach „Accepted password“ und schau, welche IP davor ständig „Failed“ hatte. Die Scanner-IP ohne Erfolg und Nutzer mit Tippfehlern sind Ablenkung.</span>`;
     };
-  },
-};
-
-/* ---------- Packet Defender ---------- */
-window.EXTRA_APPS.defender = {
-  title: "Packet Defender", icon: "🧱", group: "Security Lab", w: 520, h: 520,
-  render(body, win) {
-    const W = 480, H = 320;
-    const wrap = el("div", "center", `<div>Integrität: <b id="hp">100</b>% · Score: <b id="sc">0</b> · Best: <b id="best">0</b></div>
-      <canvas class="game" width="${W}" height="${H}" style="cursor:crosshair"></canvas>
-      <div class="dim" style="text-align:center">Klicke <span style="color:#ff2bd6">bösartige</span> Pakete (SQLi, XSS, RCE …) weg. <span style="color:#00f0ff">Legitimen</span> Traffic (HTTP, DNS, TLS …) durchlassen!</div><button class="btn">Neustart</button>`);
-    body.append(wrap);
-    const cv = $("canvas", wrap), g = cv.getContext("2d");
-    const GOOD = ["HTTP", "DNS", "TLS", "SSH", "NTP", "ICMP"], BAD = ["SQLi", "XSS", "RCE", "DDoS", "BRUTE", "XXE", "SSRF"];
-    let P, hp, score, t, spawn, over, raf, last, flash = 0;
-    const best = $("#best", wrap); best.textContent = store.get("fw-best", 0);
-    const reset = () => { P = []; hp = 100; score = 0; t = 0; spawn = 0; over = false; last = performance.now(); flash = 0; };
-    const loop = now => {
-      raf = requestAnimationFrame(loop);
-      const dt = Math.min(.05, (now - last) / 1000); last = now;
-      if (win.classList.contains("hidden") || over) { draw(); return; }
-      t += dt; spawn -= dt;
-      const speed = 55 + Math.min(90, t * 1.6);
-      if (spawn <= 0) {
-        spawn = Math.max(.32, .95 - t * .012);
-        const bad = Math.random() < .5;
-        P.push({ x: -70, y: 12 + Math.random() * (H - 56), v: speed * (.8 + Math.random() * .5), bad, label: pick1(bad ? BAD : GOOD) });
-      }
-      P.forEach(p => { p.x += p.v * dt; });
-      P = P.filter(p => {
-        if (p.x + 62 < W - 10) return true;
-        if (p.bad) { hp -= 10; flash = .25; sfx("hit"); } else score += 1;
-        return false;
-      });
-      flash = Math.max(0, flash - dt);
-      if (hp <= 0) { hp = 0; over = true; sfx("gameover"); if (score > store.get("fw-best", 0)) { store.set("fw-best", score); best.textContent = score; } }
-      if (score >= 30) achieve("defender");
-      $("#hp", wrap).textContent = hp; $("#sc", wrap).textContent = score;
-      draw();
-    };
-    const draw = () => {
-      g.fillStyle = flash > 0 ? "#2a0510" : "#000"; g.fillRect(0, 0, W, H);
-      g.strokeStyle = "rgba(0,240,255,.07)"; for (let x = 0; x < W; x += 24) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
-      g.fillStyle = settings.accent; g.globalAlpha = .5; g.fillRect(W - 10, 0, 10, H); g.globalAlpha = 1;
-      g.font = "bold 12px monospace"; g.textAlign = "center"; g.textBaseline = "middle";
-      P.forEach(p => {
-        const c = p.bad ? settings.accent2 : settings.accent;
-        g.fillStyle = "rgba(0,0,0,.8)"; g.strokeStyle = c; g.shadowColor = c; g.shadowBlur = 8; g.lineWidth = 2;
-        g.fillRect(p.x, p.y, 62, 26); g.strokeRect(p.x, p.y, 62, 26); g.shadowBlur = 0;
-        g.fillStyle = c; g.fillText(p.label, p.x + 31, p.y + 14);
-      });
-      if (over) { g.fillStyle = "rgba(0,0,0,.75)"; g.fillRect(0, 0, W, H); g.fillStyle = "#ff5470"; g.font = "bold 28px monospace"; g.fillText("BREACHED", W / 2, H / 2 - 12); g.fillStyle = "#cfeaff"; g.font = "14px monospace"; g.fillText(`Score ${score}`, W / 2, H / 2 + 18); }
-    };
-    cv.addEventListener("pointerdown", e => {
-      if (over) return;
-      const r = cv.getBoundingClientRect(), x = (e.clientX - r.left) * W / r.width, y = (e.clientY - r.top) * H / r.height;
-      for (let i = P.length - 1; i >= 0; i--) {
-        const p = P[i];
-        if (x >= p.x && x <= p.x + 62 && y >= p.y && y <= p.y + 26) {
-          P.splice(i, 1);
-          if (p.bad) { score += 3; sfx("block"); } else { hp -= 8; flash = .25; sfx("hit"); }
-          break;
-        }
-      }
-    });
-    $("button", wrap).onclick = reset;
-    reset(); raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
   },
 };

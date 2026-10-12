@@ -39,6 +39,7 @@ const ACH = {
   icons: ["🧩", "Ordnungsliebe", "Desktop-Icons umsortiert"],
   konami: ["🕹", "Old School", "Den Konami-Code eingegeben"],
   panic: ["💥", "Kernel Panic", "rm -rf / ausprobiert (simuliert)"],
+  report: ["📝", "Berichtsprofi", "Einen Pentest-Bericht exportiert"],
 };
 window.achieve = id => {
   if (!ACH[id]) return;

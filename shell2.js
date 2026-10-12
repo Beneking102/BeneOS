@@ -96,6 +96,7 @@
   let dragEl = null;
   icons.addEventListener("dragstart", e => {
     const b = e.target.closest(".icon"); if (!b) return;
+    if (document.body.classList.contains("mobile")) { e.preventDefault(); return; }
     dragEl = b; e.dataTransfer.effectAllowed = "move"; try { e.dataTransfer.setData("text/plain", b.dataset.id); } catch { /* egal */ }
     requestAnimationFrame(() => b.classList.add("dragging"));
   });

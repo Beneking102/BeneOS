@@ -77,7 +77,9 @@ const THEMES = Object.values(THEME_NAMES);
 const saved = store.get("settings", {});
 const settings = Object.assign({ accent: "#00f0ff", accent2: "#ff2bd6", wallpaper: "matrix", crt: false, sound: true, volume: .5, lite: false }, saved);
 if (saved.matrix === false && !saved.wallpaper) settings.wallpaper = "off";
-if (!saved.wallpaper && matchMedia("(prefers-reduced-motion: reduce)").matches) settings.wallpaper = "aurora";
+const smallScreen = matchMedia("(max-width: 760px)").matches, weak = (navigator.deviceMemory && navigator.deviceMemory <= 4) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+if (!saved.wallpaper && (smallScreen || matchMedia("(prefers-reduced-motion: reduce)").matches)) settings.wallpaper = "aurora";
+if (saved.lite === undefined && smallScreen && weak) settings.lite = true;
 delete settings.matrix;
 // Gespeicherte Werte nie blind vertrauen
 const HEX = /^#[0-9a-f]{6}$/i;
@@ -104,7 +106,8 @@ let zTop = 10, cascade = 0, CUR_WS = 1;   // CUR_WS: aktiver virtueller Desktop
 
 // Wenn ein maximiertes Fenster alles verdeckt, muss der Hintergrund nicht rendern
 function updateOcclusion() {
-  Wallpaper.pause(Object.values(open).some(e => e.win.classList.contains("max") && !e.win.classList.contains("hidden") && !e.win.classList.contains("ws-off")));
+  const mob = document.body.classList.contains("mobile");
+  Wallpaper.pause(Object.values(open).some(e => (mob || e.win.classList.contains("max")) && !e.win.classList.contains("hidden") && !e.win.classList.contains("ws-off")));
 }
 
 function focusWin(id) {
@@ -161,7 +164,7 @@ function openApp(id) {
 
   // Verschieben mit Snapping: Rand links/rechts = halbe Breite, oben = maximieren
   bar.addEventListener("pointerdown", e => {
-    if (e.target.closest("button") || e.button !== 0) return;
+    if (e.target.closest("button") || e.button !== 0 || document.body.classList.contains("mobile")) return;
     const snapEl = $("#snap"), dock = 64;
     let dx = e.clientX - win.offsetLeft, dy = e.clientY - win.offsetTop, zone = null, started = false, raf = 0, last = e;
     try { bar.setPointerCapture(e.pointerId); } catch { /* synthetische Events */ }
@@ -389,78 +392,17 @@ const APPS = {
         }
       });
       input.addEventListener("input", () => sfx("type"));
+      const tk = el("div", "tkeys", `<button data-k="tab">Tab</button><button data-k="up">↑</button><button data-k="down">↓</button><button data-k="help">help</button><button data-k="clear">clear</button>`);
+      row.after(tk);
+      tk.onclick = e => {
+        const k = e.target.closest("[data-k]")?.dataset.k; if (!k) return;
+        if (k === "tab") complete();
+        else if (k === "up" || k === "down") { hi = k === "up" ? Math.max(0, hi - 1) : Math.min(hist.length, hi + 1); input.value = hist[hi] || ""; }
+        else { input.value = k; input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" })); }
+        input.focus();
+      };
       term.addEventListener("click", () => { if (!getSelection().toString()) input.focus(); });
       setTimeout(() => input.focus(), 0);
-    },
-  },
-  snake: {
-    title: "Snake", icon: "🐍", w: 400, h: 500,
-    render(body, win) {
-      const N = 18, C = 20;
-      const wrap = el("div", "center", `<div>Score: <b id="sc">0</b> <span class="dim">· Pfeiltasten / WASD</span></div><canvas class="game" width="${N * C}" height="${N * C}"></canvas><button class="btn">Neustart</button>`);
-      body.append(wrap);
-      const cv = $("canvas", wrap), g = cv.getContext("2d"), sc = $("#sc", wrap);
-      let snake, dir, next, food, score, dead, timer;
-      const start = () => {
-        snake = [{ x: 9, y: 9 }, { x: 8, y: 9 }, { x: 7, y: 9 }]; dir = next = { x: 1, y: 0 };
-        score = 0; dead = false; sc.textContent = 0; placeFood();
-        clearInterval(timer); timer = setInterval(tick, 110);
-      };
-      const placeFood = () => {
-        do food = { x: (Math.random() * N) | 0, y: (Math.random() * N) | 0 };
-        while (snake.some(s => s.x === food.x && s.y === food.y));
-      };
-      const tick = () => {
-        dir = next;
-        const h = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
-        if (h.x < 0 || h.y < 0 || h.x >= N || h.y >= N || snake.some(s => s.x === h.x && s.y === h.y)) { dead = true; sfx("gameover"); clearInterval(timer); draw(); return; }
-        snake.unshift(h);
-        if (h.x === food.x && h.y === food.y) { score++; if (score === 10) achieve("snake"); sfx("eat"); sc.textContent = score; placeFood(); } else snake.pop();
-        draw();
-      };
-      const draw = () => {
-        const a = settings.accent;
-        g.fillStyle = "#000"; g.fillRect(0, 0, cv.width, cv.height);
-        g.fillStyle = settings.accent2; g.shadowColor = settings.accent2; g.shadowBlur = 10;
-        g.fillRect(food.x * C + 3, food.y * C + 3, C - 6, C - 6);
-        g.fillStyle = a; g.shadowColor = a;
-        snake.forEach(s => g.fillRect(s.x * C + 1, s.y * C + 1, C - 2, C - 2));
-        g.shadowBlur = 0;
-        if (dead) { g.fillStyle = "rgba(0,0,0,.7)"; g.fillRect(0, 0, cv.width, cv.height); g.fillStyle = "#ff5470"; g.font = "bold 28px monospace"; g.textAlign = "center"; g.fillText("GAME OVER", cv.width / 2, cv.height / 2); }
-      };
-      const keys = { ArrowUp: [0, -1], w: [0, -1], ArrowDown: [0, 1], s: [0, 1], ArrowLeft: [-1, 0], a: [-1, 0], ArrowRight: [1, 0], d: [1, 0] };
-      const onKey = e => {
-        if (!win.classList.contains("active") || !keys[e.key]) return;
-        const [x, y] = keys[e.key];
-        if (x !== -dir.x || y !== -dir.y) next = { x, y };
-        e.preventDefault();
-      };
-      document.addEventListener("keydown", onKey);
-      $("button", wrap).onclick = start;
-      start();
-      return () => { clearInterval(timer); document.removeEventListener("keydown", onKey); };
-    },
-  },
-  sysmon: {
-    title: "System Monitor", icon: "📊", w: 420, h: 340,
-    render(body) {
-      const names = ["CPU", "RAM", "GPU", "NETZ", "COFFEE"];
-      const vals = names.map(() => 30 + Math.random() * 40);
-      body.innerHTML = `<div class="pad">${names.map((n, i) => `<div>${n} <span class="dim" data-v="${i}"></span></div><div class="bar"><div data-b="${i}"></div></div>`).join("")}<canvas class="game" id="gr" width="380" height="80" style="width:100%"></canvas></div>`;
-      const gr = $("#gr", body).getContext("2d"), hist = Array(60).fill(40);
-      const upd = () => {
-        vals.forEach((v, i) => {
-          vals[i] = Math.min(100, Math.max(3, v + (Math.random() - .5) * 18));
-          $(`[data-v="${i}"]`, body).textContent = vals[i].toFixed(0) + "%";
-          $(`[data-b="${i}"]`, body).style.width = vals[i] + "%";
-        });
-        hist.push(vals[0]); hist.shift();
-        gr.clearRect(0, 0, 380, 80); gr.strokeStyle = settings.accent; gr.lineWidth = 2; gr.beginPath();
-        hist.forEach((v, i) => gr[i ? "lineTo" : "moveTo"](i * (380 / 59), 78 - v * .76)); gr.stroke();
-      };
-      upd();
-      const t = setInterval(upd, 700);
-      return () => clearInterval(t);
     },
   },
   notes: {
@@ -562,50 +504,6 @@ const APPS = {
       };
     },
   },
-  phish: {
-    title: "Phish or Legit?", icon: "🎣", w: 480, h: 420,
-    render(body) {
-      const Q = [
-        ["https://paypal.com.secure-login.xyz/verify", true, "Die echte Domain steht ganz rechts vor dem ersten „/“: hier ist es secure-login.xyz. „paypal.com“ ist nur eine Subdomain."],
-        ["https://accounts.google.com/signin", false, "Echte Google-Subdomain, HTTPS, passender Pfad."],
-        ["https://arnazon-support.com/refund", true, "Typosquatting: „arnazon“ statt „amazon“ (r+n sieht aus wie m)."],
-        ["https://github.com/login", false, "Echte Domain github.com."],
-        ["Von: support@micros0ft-security.com\nBetreff: Dein Konto wird in 24h gesperrt! Sofort bestätigen", true, "Null statt „o“, Zeitdruck und Drohung – klassisches Phishing."],
-        ["https://login.microsoftonline.com", false, "Das ist der echte Microsoft-Login."],
-        ["http://192.168.0.5/bank/login.php?redirect=paypal", true, "Keine HTTPS, nackte IP statt Domain und ein verdächtiger Redirect-Parameter."],
-        ["Von: noreply@github.com\nBetreff: Neuer Login von unbekanntem Gerät (du musst nichts klicken – prüfe es in deinen Einstellungen)", false, "Absender stimmt, keine Panik-Mache. Trotzdem nie über Mail-Links einloggen."],
-        ["https://xn--pypal-4ve.com/login", true, "„xn--“ ist Punycode: ein Homograph-Angriff mit Sonderzeichen, die wie „paypal“ aussehen."],
-        ["https://www.sparkasse.de/privatkunden.html", false, "Offizielle Domain der Sparkasse."],
-      ].sort(() => Math.random() - .5);
-      let i, score;
-      const wrap = el("div", "center");
-      body.append(wrap);
-      const show = () => {
-        if (i >= Q.length) {
-          if (score === Q.length) achieve("phish");
-          wrap.innerHTML = `<h1>${score}/${Q.length}</h1><div>${score >= 9 ? "Security-Profi 🛡" : score >= 6 ? "Solide, bleib wachsam." : "Schau dir die Erklärungen nochmal an."}</div><button class="btn">Nochmal</button>`;
-          $("button", wrap).onclick = reset; return;
-        }
-        const [txt] = Q[i];
-        wrap.innerHTML = `<div class="dim">Frage ${i + 1}/${Q.length} · Score ${score}</div><pre class="sample"></pre>
-          <div><button class="btn" data-a="1">🎣 Phishing</button> <button class="btn" data-a="0">✅ Legit</button></div><div id="fb" style="min-height:70px;text-align:center;max-width:400px"></div>`;
-        $(".sample", wrap).textContent = txt;
-        wrap.querySelectorAll("[data-a]").forEach(b => b.onclick = () => {
-          const ok = (b.dataset.a === "1") === Q[i][1];
-          if (ok) score++;
-          sfx(ok ? "success" : "error");
-          wrap.querySelectorAll("[data-a]").forEach(x => { x.disabled = true; });
-          const fb = $("#fb", wrap);
-          fb.innerHTML = `<b style="color:${ok ? "#39ff88" : "#ff5470"}">${ok ? "Richtig!" : "Falsch!"}</b> `;
-          fb.append(document.createTextNode(Q[i][2]));
-          const n = el("button", "btn", "Weiter ▶"); n.style.marginTop = "8px"; n.onclick = () => { i++; show(); };
-          fb.append(el("br"), n);
-        });
-      };
-      const reset = () => { Q.sort(() => Math.random() - .5); i = 0; score = 0; show(); };
-      reset();
-    },
-  },
   ctf: {
     title: "Mini CTF", icon: "🚩", w: 520, h: 480,
     render(body) {
@@ -684,7 +582,7 @@ function addIcon(id) {
   b.title = a.title;
   b.ondblclick = () => openApp(id);
   b.onkeydown = e => { if (e.key === "Enter") openApp(id); };
-  b.onclick = e => { if (e.detail === 0 || matchMedia("(pointer:coarse)").matches) openApp(id); };
+  b.onclick = e => { if (e.detail === 0 || matchMedia("(pointer:coarse)").matches || document.body.classList.contains("mobile")) openApp(id); };
   iconBox.append(b);
 }
 Object.keys(APPS).forEach(addIcon);
