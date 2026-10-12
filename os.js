@@ -100,11 +100,11 @@ function applySettings() {
 /* ---------- Fenster-Manager ---------- */
 const winLayer = $("#windows"), tasks = $("#tasks");
 const open = {};            // id -> {win, btn, cleanup}
-let zTop = 10, cascade = 0;
+let zTop = 10, cascade = 0, CUR_WS = 1;   // CUR_WS: aktiver virtueller Desktop
 
 // Wenn ein maximiertes Fenster alles verdeckt, muss der Hintergrund nicht rendern
 function updateOcclusion() {
-  Wallpaper.pause(Object.values(open).some(e => e.win.classList.contains("max") && !e.win.classList.contains("hidden")));
+  Wallpaper.pause(Object.values(open).some(e => e.win.classList.contains("max") && !e.win.classList.contains("hidden") && !e.win.classList.contains("ws-off")));
 }
 
 function focusWin(id) {
@@ -118,9 +118,11 @@ function focusWin(id) {
 function openApp(id) {
   closeStart();
   if (!APPS[id]) return;
-  if (open[id]) {
-    open[id].win.classList.remove("hidden");
-    focusWin(id);
+  if (open[id]) {                      // schon offen: auf den aktuellen Desktop holen
+    const e = open[id];
+    e.win.dataset.ws = CUR_WS; e.btn.dataset.ws = CUR_WS; e.btn.hidden = false;
+    e.win.classList.remove("hidden", "ws-off");
+    focusWin(id); updateOcclusion();
     return;
   }
   const app = APPS[id];
@@ -128,10 +130,12 @@ function openApp(id) {
   const w = Math.min(app.w, innerWidth - 20), h = Math.min(app.h, innerHeight - 64);
   const off = (cascade++ % 6) * 26;
   win.style.cssText = `width:${w}px;height:${h}px;left:${Math.max(0, (innerWidth - w) / 2 - 80 + off)}px;top:${Math.max(0, (innerHeight - 44 - h) / 2 - 40 + off)}px`;
-  win.innerHTML = `<div class="titlebar"><span>${app.icon}</span><b>${app.title}</b><button class="mn" title="Minimieren">—</button><button class="mx" title="Maximieren">▢</button><button class="x" title="Schließen">✕</button></div><div class="wbody"></div>`;
+  win.innerHTML = `<div class="titlebar"><span>${app.icon}</span><b>${esc(app.title)}</b><button class="mn" title="Minimieren">—</button><button class="mx" title="Maximieren">▢</button><button class="x" title="Schließen">✕</button></div><div class="wbody"></div>`;
   winLayer.append(win);
 
-  const btn = el("button", "task", `${app.icon} ${app.title}`);
+  const btn = el("button", "task");
+  btn.textContent = `${app.icon} ${app.title}`;
+  win.dataset.ws = CUR_WS; btn.dataset.ws = CUR_WS;
   tasks.append(btn);
   const entry = { win, btn, cleanup: null };
   open[id] = entry;
@@ -215,7 +219,7 @@ function closeApp(id) {
   e.btn.remove();
   e.win.classList.add("closing");
   setTimeout(() => e.win.remove(), 140);
-  const last = Object.keys(open).pop();
+  const last = Object.keys(open).filter(k => open[k].win.dataset.ws == CUR_WS).pop();
   if (last) focusWin(last);
   updateOcclusion();
 }
@@ -356,9 +360,21 @@ const APPS = {
         sudo: () => "<span class='err'>Netter Versuch. 😉</span>",
         exit: () => { closeApp("terminal"); return null; },
       };
-      out(`<span class="hi">BeneOS Terminal</span> – tippe <span class="hi">help</span> für alle Befehle.\n`);
+      Object.assign(cmds, window.TERM_CMDS || {});
+      out(`<span class="hi">BeneOS Terminal</span> – tippe <span class="hi">help</span> für alle Befehle (Tab vervollständigt).\n`);
+      const complete = () => {
+        const parts = input.value.split(/\s+/), v = parts[0].toLowerCase();
+        if (parts.length === 1) {
+          const m = Object.keys(cmds).filter(k => k.startsWith(v));
+          if (m.length === 1) input.value = m[0] + " "; else if (m.length > 1) out(`<span class="dim">${m.join("  ")}</span>`);
+        } else if (v === "open" || v === "kill") {
+          const p = parts[1].toLowerCase(), m = Object.keys(APPS).map(k => k.replace("repo:", "")).filter(k => k.toLowerCase().startsWith(p));
+          if (m.length === 1) input.value = parts[0] + " " + m[0].toLowerCase(); else if (m.length > 1) out(`<span class="dim">${m.map(esc).join("  ")}</span>`);
+        }
+      };
       input.addEventListener("keydown", e => {
-        if (e.key === "ArrowUp") { hi = Math.max(0, hi - 1); input.value = hist[hi] || ""; e.preventDefault(); }
+        if (e.key === "Tab") { e.preventDefault(); complete(); }
+        else if (e.key === "ArrowUp") { hi = Math.max(0, hi - 1); input.value = hist[hi] || ""; e.preventDefault(); }
         else if (e.key === "ArrowDown") { hi = Math.min(hist.length, hi + 1); input.value = hist[hi] || ""; e.preventDefault(); }
         else if (e.key === "Enter") {
           const raw = input.value.trim(); input.value = "";
@@ -367,8 +383,9 @@ const APPS = {
           out(`<span class="ps">${session.user}@beneos:~$</span> ${esc(raw)}`);
           const [c, ...args] = raw.split(/\s+/);
           const fn = Object.hasOwn(cmds, c.toLowerCase()) ? cmds[c.toLowerCase()] : null;
-          const res = fn ? fn(args[0]?.toLowerCase()) : `<span class="err">${esc(c)}: Befehl nicht gefunden</span>`;
-          if (res != null) out(res);
+          const res = fn ? fn(args[0]?.toLowerCase(), args, { out, hist, term, raw }) : `<span class="err">${esc(c)}: Befehl nicht gefunden</span>`;
+          if (res && typeof res.then === "function") res.then(r => { if (r != null) out(r); }).catch(err => out(`<span class="err">Fehler: ${esc(err.message || "Netzwerk")}</span>`));
+          else if (res != null) out(res);
         }
       });
       input.addEventListener("input", () => sfx("type"));
@@ -600,6 +617,7 @@ const APPS = {
         ["Das Terminal weiß mehr", "Schau dich im Terminal um: ls, cat …", () => "???", "BENE{cat_fl4g_txt}"],
         ["Default Credentials", "Am Login-Screen zählen die Klassiker. Melde dich ab (Startmenü → Herunterfahren) und probiere admin / ?", () => "???", "BENE{d3f4ult_cr3ds_f41l}"],
         ["Versteckte Dateien", "Im Datei-Explorer gibt es Dinge, die man erst sieht, wenn man danach fragt.", () => "???", "BENE{h1dd3n_f1l3s_r34l}"],
+        ["Cheat-Code", "Manche Cheats sind älter als das Web. Probier sie auf dem Desktop (nicht im Textfeld).", () => "???", "BENE{k0n4m1_c0d3_unl0ck3d}"],
         ["Port 1337", "nmap im Terminal hat etwas verraten. Wie sprichst du mit einem offenen Port? (Tipp: nc)", () => "???", "BENE{1337_p0rt_0p3n}"],
       ];
       console.log("%c[BeneOS CTF] Gut gemacht, du schaust in die Konsole. Flag: BENE{c0ns0le_l0g_l34k}", "color:#00f0ff;font-weight:bold");
@@ -652,7 +670,7 @@ const APPS = {
 Object.assign(APPS, window.EXTRA_APPS || {});
 Object.entries({
   about: "System", projects: "System", terminal: "System", notes: "System", contact: "System", settings: "System",
-  cipher: "Security Lab", passlab: "Security Lab", phish: "Security Lab", ctf: "Security Lab", sysmon: "Fun", snake: "Fun",
+  cipher: "Security Lab", passlab: "Security Lab", phish: "Security Lab", ctf: "Security Lab", snake: "Fun",
 }).forEach(([k, g]) => { APPS[k].group = g; });
 Object.values(APPS).forEach(a => { a.group ||= "System"; });
 
@@ -661,6 +679,7 @@ const iconBox = $("#icons");
 function addIcon(id) {
   const a = APPS[id];
   const b = el("button", "icon" + (a.sec ? " sec" : ""), `<i>${a.icon}</i><span></span>`);
+  b.dataset.id = id; b.draggable = true;
   $("span", b).textContent = a.title;
   b.title = a.title;
   b.ondblclick = () => openApp(id);
@@ -674,7 +693,7 @@ const start = $("#startmenu");
 function buildStart() {
   const groups = {};
   Object.entries(APPS).forEach(([id, a]) => { (groups[a.group || "System"] ||= []).push(id); });
-  const order = ["System", "Security Lab", "Security Repos", "Dev Repos", "Fun"];
+  const order = ["System", "Security Lab", "Tools", "Security Repos", "Dev Repos", "Fun"];
   start.innerHTML = `<header><div class="who"><span class="avatar sm">${esc(PROFILE.name[0])}</span><div><b>${esc(PROFILE.name)}</b><div class="dim">${esc(session.user)}@beneos</div></div></div>
     <input id="ssearch" class="field" placeholder="Apps &amp; Repos suchen …" autocomplete="off" spellcheck="false" aria-label="Suchen"></header>
     <div class="slist">` +

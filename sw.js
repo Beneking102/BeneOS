@@ -1,8 +1,8 @@
 "use strict";
 /* Service Worker: Network-first für eigene Dateien (neue Deploys sind sofort sichtbar),
    mit Cache-Fallback für Offline-Betrieb. Fremde Hosts (GitHub-API) werden nicht angefasst. */
-const CACHE = "beneos-v3";
-const CORE = ["./", "index.html", "style.css", "os.js", "lab.js", "lab2.js", "login.js", "shell.js", "wallpaper.js", "sounds.js", "repos-fallback.js", "manifest.webmanifest", "icon-192.png"];
+const CACHE = "beneos-v4";
+const CORE = ["./", "index.html", "style.css", "os.js", "lab.js", "lab2.js", "login.js", "shell.js", "shell2.js", "apps1.js", "tools.js", "live.js", "wallpaper.js", "sounds.js", "repos-fallback.js", "manifest.webmanifest", "icon-192.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));

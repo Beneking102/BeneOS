@@ -22,6 +22,23 @@ const ACH = {
   wallpaper: ["🖼", "Raumgestalter", "Den Hintergrund gewechselt"],
   ctx: ["🖱", "Rechtsklick-Profi", "Das Desktop-Kontextmenü geöffnet"],
   search: ["🔎", "Schnellstarter", "Eine App über die Suche gestartet"],
+  paint: ["🎨", "Pixel-Künstler", "Ein Bild in PixelLab gespeichert"],
+  mines: ["💣", "Minenräumer", "Minesweeper gewonnen"],
+  tetris: ["🧱", "Blockbuster", "500 Punkte in Tetris"],
+  typist: ["⌨", "Schnelle Finger", "30 WPM bei mindestens 90 % Genauigkeit"],
+  vault: ["🔐", "Tresorknacker (Besitzer)", "Einen verschlüsselten Tresor angelegt"],
+  dns: ["🌐", "DNS-Detektiv", "Eine echte DNS-Abfrage durchgeführt"],
+  dig: ["📡", "Dig Deeper", "dig im Terminal benutzt"],
+  jwt: ["🪙", "Token-Leser", "Ein JWT dekodiert"],
+  passgen: ["🎲", "Zufallsgenerator", "Ein Passwort generiert und kopiert"],
+  radio: ["📻", "Auf Sendung", "Das Synthwave-Radio eingeschaltet"],
+  globe: ["🌍", "Weltbeobachter", "Den Cyber Globe geöffnet"],
+  bot: ["🤖", "Gesprächig", "Mit BeneBot gesprochen"],
+  ws: ["🗂", "Multitasker", "Den virtuellen Desktop gewechselt"],
+  overview: ["▦", "Überblick", "Die Fenster-Übersicht geöffnet"],
+  icons: ["🧩", "Ordnungsliebe", "Desktop-Icons umsortiert"],
+  konami: ["🕹", "Old School", "Den Konami-Code eingegeben"],
+  panic: ["💥", "Kernel Panic", "rm -rf / ausprobiert (simuliert)"],
 };
 window.achieve = id => {
   if (!ACH[id]) return;

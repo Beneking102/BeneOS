@@ -9,21 +9,31 @@
 ## Features
 
 **Desktop & Shell**
-- Window manager with drag, resize, minimize, maximize, **edge snapping** (left / right / top), close animations, taskbar dock and start menu with **search** (`Ctrl+K`).
-- **Login & lock screen** with account tiles, animated auth sequence, failed-attempt lockout and a big clock.
-- **Control Center** (quick settings, volume, wallpapers, color schemes), **notification history**, **calendar**, context menu, desktop **widgets** (clock, live GitHub stats), screensaver after 2 minutes idle.
-- **5 live wallpapers**: Matrix, Synthwave grid, starfield, aurora, off – each with its own frame-rate cap and resolution.
-- Retro-style **sounds**, fully synthesized with the Web Audio API (no audio files).
-- Installable **PWA** with offline fallback.
+- Window manager with drag, resize, minimize, maximize, **edge snapping**, close animations, taskbar dock and start menu with **search** (`Ctrl+K`).
+- **3 virtual desktops** (`Ctrl+Alt+1/2/3`) and a **window overview** (`Ctrl+Alt+O`) to move or close windows.
+- **Login & lock screen** with account tiles, animated auth sequence and failed-attempt lockout.
+- **Control Center**, **notification history**, **calendar**, context menu, drag-and-drop **desktop icons** (order is saved), screensaver after 2 minutes idle.
+- Live **widgets**: clock, GitHub stats from the real API, simulated threat feed. Taskbar shows network and battery status.
+- **5 live wallpapers** (Matrix, Synthwave, starfield, aurora, off) and 8 color schemes.
+- Retro-style **sounds** synthesized with the Web Audio API (no audio files). Installable **PWA**.
 
 **Portfolio**
-- **Every public GitHub repo is an app** – loaded live from the GitHub API, with an offline snapshot as fallback. Security repos are highlighted.
-- Profile with tabs (profile, highlights, tech stack), certificates (eWPTX), file explorer, achievements.
+- **Every public GitHub repo is an app** – loaded live from the GitHub API, with an offline snapshot as fallback.
+- Profile with tabs (profile, highlights, tech stack), certificates (eWPTX), file explorer, 35 achievements.
+- **BeneBot**: rule-based assistant that answers questions about the portfolio, opens apps, changes settings and gives CTF hints (no cloud AI, runs locally).
 
 **Security Lab**
-- Cipher Lab (encode / decode / hash), Password Lab (entropy & crack-time estimate), Hash Breaker (wordlist, mutation and brute-force attacks), Log Hunter (find the attacker in SSH logs), Packet Defender (arcade firewall), Phish or Legit? (quiz).
-- **Mini CTF** with 8 flags hidden across the OS (login screen, terminal, file system, DevTools console, …).
-- Terminal with `nmap` (simulated), `ls`, `cat`, `repos`, `theme`, `wallpaper`, `lock`.
+- **Security Toolbox**: JWT decoder, hash identifier, secure password generator, IPv4 subnet calculator, Unix-time converter.
+- **DNS Lab**: real DNS-over-HTTPS queries (Cloudflare) and a mail-security check (SPF, DMARC, DKIM).
+- **Vault**: AES-256-GCM encrypted note (PBKDF2, 250k iterations), stored only in your browser.
+- Cipher Lab, Password Lab, Hash Breaker, Log Hunter, Packet Defender, Phish or Legit?, **Cyber Globe** (simulated attack map).
+- **Mini CTF** with 9 flags hidden across the OS (login screen, terminal, file system, DevTools console, a cheat code …).
+- Terminal with `dig` (real DNS), `nmap` (simulated), `sha256`, `top`, `kill`, `ws`, `ping`, tab completion and more.
+
+**Tools & Fun**
+- Calculator (with programmer mode and bit toggles), PixelLab (paint), **Task Manager** with real metrics (FPS, JS heap, DOM nodes, network, battery).
+- Minesweeper, Tetris, Snake, Hacker Typing, **Synthwave Radio** (generative music with visualizer).
+- And a few secrets to find …
 
 **Performance**
 - Background pauses when the tab is hidden, a window covers the screen, or the screensaver runs.
@@ -34,7 +44,8 @@
 
 - `os.js` → `PROFILE` block at the top: name, bio, skills, certificates (date / credential ID / verify link), live projects, links.
 - `lab.js`, `lab2.js` → Security Lab apps, achievements and file explorer.
-- `shell.js` → control center, widgets, screensaver, shortcuts · `login.js` → login & lock screen.
+- `shell.js`, `shell2.js` → control center, widgets, screensaver, virtual desktops, overview, terminal extensions, easter eggs · `login.js` → login & lock screen.
+- `apps1.js` → calculator, paint, games · `tools.js` → toolbox, DNS lab, vault · `live.js` → globe, task manager, radio, BeneBot.
 - `wallpaper.js` → background engine · `sounds.js` → sound effects · `sw.js` → service worker.
 
 Run locally: open `index.html`, or `npx serve .`
@@ -50,9 +61,9 @@ Without them the workflow skips the deploy and stays green.
 
 ## Security notes
 
-- Strict Content-Security-Policy; the only external connection is `api.github.com`.
+- Strict Content-Security-Policy; external connections are limited to `api.github.com` and (DNS Lab only) `cloudflare-dns.com`.
 - All GitHub data is escaped before rendering; README text is inserted as plain text.
-- Everything in the Security Lab runs locally in the browser. Nothing is sent anywhere, and the `nmap` command is a simulation.
+- Everything in the Security Lab runs locally in the browser; only the DNS Lab sends the queried domain to Cloudflare. The `nmap`, `ping`, `hack` commands and the threat feed/globe are simulations – nothing is scanned.
 
 ## License
 

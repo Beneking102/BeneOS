@@ -58,6 +58,12 @@
     eat() { tone(900, 0, .06, "square", .08, 1500); },
     hit() { tone(140, 0, .12, "square", .12, 70); noise(0, .1, .12, 600); },
     block() { tone(1200, 0, .05, "square", .08, 1800); },
+    pop() { tone(500, 0, .05, "square", .07, 900); },
+    drop() { tone(220, 0, .06, "square", .08, 120); },
+    line() { [660, 880, 1100].forEach((f, i) => tone(f, i * .05, .12, "square", .07)); },
+    boom() { noise(0, .35, .25, 300); tone(90, 0, .3, "sawtooth", .15, 40); },
+    win() { [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5, 1318.5].forEach((f, i) => tone(f, i * .1, .3, "triangle", .2)); },
+    flag() { tone(1500, 0, .04, "square", .06); tone(1000, .04, .05, "square", .06); },
     gameover() { [392, 330, 262, 196].forEach((f, i) => tone(f, i * .18, .35, "sawtooth", .12)); },
   };
 
@@ -71,6 +77,8 @@
       if (typeof vol === "number") { volume = Math.min(1, Math.max(0, vol)); if (master) master.gain.value = volume; }
     },
     unlock() { ensure(); },
+    // Zugriff auf den Audio-Graph (für Radio & Visualizer)
+    node() { return ensure() ? { ctx, out: master } : null; },
   };
   window.sfx = n => window.SFX.play(n);
 })();
