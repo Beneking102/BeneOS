@@ -40,6 +40,7 @@ const ACH = {
   konami: ["🕹", "Old School", "Den Konami-Code eingegeben"],
   panic: ["💥", "Kernel Panic", "rm -rf / ausprobiert (simuliert)"],
   report: ["📝", "Berichtsprofi", "Einen Pentest-Bericht exportiert"],
+  nfc: ["📶", "Physical Access", "Benes NFC-Karte angetippt"],
 };
 window.achieve = id => {
   if (!ACH[id]) return;
@@ -50,6 +51,13 @@ window.achieve = id => {
   setTimeout(() => sfx("success"), 250);
   const l = document.querySelector(".ach-list"); if (l) l.dispatchEvent(new Event("refresh"));
 };
+// Erfolge, die außerhalb von BeneOS verdient wurden (z. B. per NFC auf tap.html), beim Start nachholen
+setTimeout(() => {
+  const pending = store.get("pending-ach", []);
+  if (!pending.length) return;
+  store.set("pending-ach", []);
+  pending.forEach(id => achieve(id));
+}, 3000);
 window.EXTRA_APPS.achievements = {
   title: "Erfolge", icon: "🏆", group: "System", w: 460, h: 520,
   render(body) {

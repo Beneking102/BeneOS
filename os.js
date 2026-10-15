@@ -517,6 +517,7 @@ const APPS = {
         ["Versteckte Dateien", "Im Datei-Explorer gibt es Dinge, die man erst sieht, wenn man danach fragt.", () => "???", "BENE{h1dd3n_f1l3s_r34l}"],
         ["Cheat-Code", "Manche Cheats sind älter als das Web. Probier sie auf dem Desktop (nicht im Textfeld).", () => "???", "BENE{k0n4m1_c0d3_unl0ck3d}"],
         ["Port 1337", "nmap im Terminal hat etwas verraten. Wie sprichst du mit einem offenen Port? (Tipp: nc)", () => "???", "BENE{1337_p0rt_0p3n}"],
+        ["Physical Access", "Diese Flag gibt es nicht im Browser. Halte dein Handy an Benes Handy oder an einen seiner NFC-Sticker.", () => "???", "BENE{phys1c4l_4cc3ss_gr4nt3d}"],
       ];
       console.log("%c[BeneOS CTF] Gut gemacht, du schaust in die Konsole. Flag: BENE{c0ns0le_l0g_l34k}", "color:#00f0ff;font-weight:bold");
       const solved = new Set(store.get("ctf", []));

@@ -203,7 +203,7 @@
       closeApp(id); return `<span class="ok">${esc(APPS[id].title)} beendet.</span>`;
     },
     history: (a, args, c) => c.hist.map((h, i) => `${String(i + 1).padStart(4)}  ${esc(h)}`).join("\n"),
-    ctf: () => { const n = store.get("ctf", []).length; return `Flags gefunden: <span class="hi">${n}</span> / 9  ·  ${n === 9 ? "<span class='ok'>Alle! 🏆</span>" : "tippe <span class='hi'>open ctf</span>"}`; },
+    ctf: () => { const n = store.get("ctf", []).length; return `Flags gefunden: <span class="hi">${n}</span> / 10  ·  ${n === 10 ? "<span class='ok'>Alle! 🏆</span>" : "tippe <span class='hi'>open ctf</span>"}`; },
     fortune: () => esc(pick(QUOTES)),
     cowsay: (a, args) => { const t = esc(args.join(" ") || "Muuh – patch dein System!"); const l = "─".repeat(Math.min(40, t.length + 2)); return ` ┌${l}┐\n │ ${t} │\n └${l}┘\n        \\   ^__^\n         \\  (oo)\\_______\n            (__)\\       )\\/\\\n                ||----w |\n                ||     ||`; },
     sha256: async (a, args) => (args.length ? ct(await sha(args.join(" "))) : "<span class='err'>Nutzung: sha256 &lt;text&gt;</span>"),
@@ -280,7 +280,7 @@
   window.updateScoreWidgets = () => {
     if (CUR_WS === 2) {
       const f = store.get("ctf", []).length, a = store.get("ach", []).length, tot = Object.keys(ACH).length;
-      wsc.innerHTML = `<div class="wgh-h">🚩 Dein Fortschritt</div><div class="hsrow"><span>CTF-Flags</span><b>${f}/9</b></div>${meter(f, 9)}<div class="hsrow"><span>Erfolge</span><b>${a}/${tot}</b></div>${meter(a, tot)}<button class="chip" data-open="ctf">🚩 Zum CTF</button> <button class="chip" data-open="achievements">🏆 Erfolge</button>`;
+      wsc.innerHTML = `<div class="wgh-h">🚩 Dein Fortschritt</div><div class="hsrow"><span>CTF-Flags</span><b>${f}/10</b></div>${meter(f, 10)}<div class="hsrow"><span>Erfolge</span><b>${a}/${tot}</b></div>${meter(a, tot)}<button class="chip" data-open="ctf">🚩 Zum CTF</button> <button class="chip" data-open="achievements">🏆 Erfolge</button>`;
     } else if (CUR_WS === 3) {
       const g = k => store.get("hs-" + k, 0);
       const rows = [["🐍 Snake", Math.max(g("snake-wall"), g("snake-wrap"))], ["🧱 Tetris", g("tetris")], ["🛡 Defender", g("defender")], ["🎣 Phish", g("phish")], ["⌨ Typing", g("typing") ? g("typing") + " WPM" : 0], ["💣 Minesweeper", g("mines-easy") ? g("mines-easy") + " s" : 0]];

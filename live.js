@@ -246,6 +246,7 @@ window.EXTRA_APPS = window.EXTRA_APPS || {};
     "Im Datei-Explorer gibt es versteckte Dateien – die Checkbox oben rechts verrät sie.",
     "Manche Cheats sind älter als das Web: ↑ ↑ ↓ ↓ ← → ← → B A.",
     "Das Terminal reagiert auf gefährliche Befehle … aber nur zum Spaß. Und den Schreibtisch kann man jederzeit neu starten.",
+    "Flag 10 gibt es nicht im Browser: Sie wartet auf Benes NFC-Karte. Physischer Zugang schlägt jede Firewall.",
   ];
   const JOKES = ["Warum nehmen Hacker immer Münzen mit? Weil sie Cookies klauen wollen… und Kleingeld ist auch gut. 🍪", "Es gibt 10 Arten von Menschen: Die, die Binärcode verstehen, und die anderen.", "SQL-Abfrage geht in eine Bar, geht zu zwei Tischen und fragt: „Darf ich mich JOINen?“", "Mein Passwort ist „falsch“ – damit sagt mir der Browser immer: „Dein Passwort ist falsch.“", "Ein Pentester ist jemand, der das Schloss öffnet – mit Erlaubnis. 🔓"];
   const TIPS = [
