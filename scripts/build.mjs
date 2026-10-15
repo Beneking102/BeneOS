@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const dist = join(root, "dist");
-const SKIP = new Set([".git", ".github", ".netlify", "node_modules", "scripts", "dist", "README.md", ".gitignore", "netlify.toml", "package.json", "package-lock.json"]);
+const SKIP = new Set([".git", ".github", ".netlify", "node_modules", "scripts", "dist", "README.md", ".gitignore", "netlify.toml", "netlify", "package.json", "package-lock.json"]);
 
 rmSync(dist, { recursive: true, force: true });
 mkdirSync(dist, { recursive: true });
