@@ -17,6 +17,7 @@
   .btn { display: block; padding: 15px; margin: 12px auto 0; max-width: 340px; width: calc(100% - 32px); border-radius: 12px;
          border: 1px solid #333; color: var(--w); background: #111; text-decoration: none; font-weight: 700; font-size: 16px; text-align: center; }
   .btn.ghost { background: transparent; color: var(--mut); }
+  .btn.big { background: var(--red); border: 0; font-size: 18px; padding: 17px; }
 
   /* ---------- 1) Wir sehen dich ---------- */
   #sehen { background: #000; }
@@ -28,24 +29,37 @@
 
   /* ---------- 2) Hinter dir ---------- */
   #hinter { background: #05060a; }
-  #hvid { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); filter: brightness(.82) contrast(1.05); }
+  #hvid { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); filter: brightness(.9) contrast(1.05); transition: filter 2s; }
+  #hgrain { position: fixed; inset: 0; opacity: .12; pointer-events: none; mix-blend-mode: screen;
+            background-image: repeating-linear-gradient(0deg, #000 0, #000 1px, transparent 1px, transparent 3px); }
+  #hvig { position: fixed; inset: 0; pointer-events: none; box-shadow: inset 0 0 160px 60px rgba(0,0,0,.9); transition: box-shadow 2s; }
+  #hbox { position: fixed; border: 2px solid var(--g); border-radius: 6px; box-shadow: 0 0 16px rgba(57,255,122,.5); transition: all .4s; display: none; }
+  #hbox::after { content: attr(data-t); position: absolute; left: 0; top: -22px; font: 11px ui-monospace, Consolas, monospace; color: var(--g); white-space: nowrap; }
   #hscan { position: fixed; left: 0; right: 0; height: 2px; background: rgba(57,255,122,.8); box-shadow: 0 0 14px var(--g); top: 0; }
-  #hfig { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 46%; max-width: 230px; opacity: 0; pointer-events: none; }
+  #hfig { position: fixed; left: 50%; bottom: -4%; transform: translateX(-50%); width: 58%; max-width: 280px; opacity: 0; pointer-events: none; }
   #hui { position: fixed; left: 0; right: 0; bottom: 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, rgba(0,0,0,.85) 40%); text-align: center; }
   #hui .lbl { font: 13px ui-monospace, Consolas, monospace; color: var(--g); letter-spacing: 1px; min-height: 2.4em; }
+  #hui .lbl b { color: var(--red); }
   #hwarn { position: fixed; inset: 0; display: none; place-items: center; background: #000; z-index: 6; }
   #hwarn.on { display: grid; }
-  #hface { width: min(92vw, 460px); opacity: 0; }
+  #hface { width: 118vw; max-width: none; opacity: 0; transform: scale(1.2); }
 
-  /* ---------- 3) Glitch ---------- */
-  #glitch { background: #000; }
-  #gcv { position: fixed; inset: 0; }
-  #gtxt { position: fixed; left: 0; right: 0; top: 42%; transform: translateY(-50%); text-align: center; padding: 0 18px;
-          font: 800 26px/1.25 ui-monospace, Consolas, monospace; color: var(--w); text-shadow: 0 0 16px var(--red); }
-  #gtxt small { display: block; font-size: 14px; font-weight: 400; color: var(--mut); margin-top: 10px; letter-spacing: 1px; }
-  body.gl #glitch { animation: gl .22s steps(2) infinite; }
-  @keyframes gl { 0% { transform: translate(0); filter: none; } 30% { transform: translate(-6px, 2px); filter: hue-rotate(80deg); }
-                  60% { transform: translate(5px, -3px); filter: invert(1); } 100% { transform: translate(0); } }
+  /* ---------- 3) Besessen ---------- */
+  #besessen { background: #000; }
+  #bstart { position: fixed; inset: 0; display: grid; place-content: center; text-align: center; padding: 24px; }
+  #bstart .ic { font-size: 70px; }
+  #bstart h2 { font-size: 24px; margin: 10px 0 2px; }
+  #bstart p { color: var(--mut); max-width: 320px; margin: 0 auto; }
+  #bcv { position: fixed; inset: 0; display: none; }
+  #bpop { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
+  .pop { position: absolute; left: 50%; transform: translateX(-50%); width: min(90vw, 360px); background: #1b1b1f; color: #fff;
+         border: 1px solid #3a3a42; border-radius: 14px; padding: 14px 16px; box-shadow: 0 10px 40px rgba(0,0,0,.6); font-size: 15px; }
+  .pop b { display: block; margin-bottom: 2px; } .pop .ok { color: var(--red); font-weight: 700; margin-top: 8px; }
+  #bbig { position: fixed; left: 0; right: 0; top: 50%; transform: translateY(-50%); z-index: 4; text-align: center;
+          font: 900 12vw/1.05 ui-monospace, Consolas, monospace; color: var(--red); text-shadow: 0 0 30px var(--red); display: none; padding: 0 10px; }
+  body.shake #besessen { animation: shk .09s infinite; }
+  @keyframes shk { 0% { transform: translate(0,0); } 25% { transform: translate(-7px,4px); } 50% { transform: translate(6px,-5px); } 75% { transform: translate(-4px,-3px); } 100% { transform: translate(5px,3px); } }
+  #bstrobe { position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0; }
 
   /* ---------- Auflösung ---------- */
   #reveal { position: fixed; inset: 0; z-index: 50; display: none; place-items: center; padding: 26px 16px; text-align: center;
@@ -57,7 +71,7 @@
   #reveal p { color: #dfe; opacity: .9; }
   #reveal .tech { font-size: 13px; color: var(--mut); margin-top: 16px; }
 
-  @media (prefers-reduced-motion: reduce) { body.gl #glitch { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { body.shake #besessen { animation: none; } }
 </style>
 </head>
 <body>
@@ -68,27 +82,42 @@
 <!-- 2) Hinter dir -->
 <section class="scene" id="hinter">
   <video id="hvid" playsinline muted autoplay></video>
+  <div id="hgrain"></div>
+  <div id="hvig"></div>
+  <div id="hbox" data-t="SUBJEKT 01"></div>
   <div id="hscan"></div>
-  <svg id="hfig" viewBox="0 0 200 320" aria-hidden="true"><defs><radialGradient id="fg" cx="50%" cy="30%" r="70%"><stop offset="0%" stop-color="#1a1a1f"/><stop offset="100%" stop-color="#000"/></radialGradient></defs>
-    <ellipse cx="100" cy="300" rx="90" ry="40" fill="#000" opacity=".5"/>
-    <path d="M100 40c-34 0-54 26-54 70 0 30-14 44-22 70-6 20-10 40-10 70h172c0-30-4-50-10-70-8-26-22-40-22-70 0-44-20-70-54-70z" fill="url(#fg)"/>
-    <circle cx="100" cy="70" r="40" fill="url(#fg)"/>
-    <circle cx="84" cy="66" r="6" fill="#ff2d3f"/><circle cx="116" cy="66" r="6" fill="#ff2d3f"/>
+  <svg id="hfig" viewBox="0 0 200 320" aria-hidden="true"><defs><radialGradient id="fg" cx="50%" cy="28%" r="72%"><stop offset="0%" stop-color="#17171c"/><stop offset="100%" stop-color="#000"/></radialGradient></defs>
+    <ellipse cx="100" cy="312" rx="96" ry="30" fill="#000" opacity=".6"/>
+    <path d="M100 36c-36 0-58 28-58 74 0 32-15 47-24 74-7 22-11 42-11 74h186c0-32-4-52-11-74-9-27-24-42-24-74 0-46-22-74-58-74z" fill="url(#fg)"/>
+    <circle cx="100" cy="68" r="43" fill="url(#fg)"/>
+    <ellipse cx="82" cy="64" rx="7" ry="9" fill="#ff2d3f"><animate attributeName="opacity" values="1;.4;1" dur="1.6s" repeatCount="indefinite"/></ellipse>
+    <ellipse cx="118" cy="64" rx="7" ry="9" fill="#ff2d3f"><animate attributeName="opacity" values="1;.4;1" dur="1.6s" repeatCount="indefinite"/></ellipse>
   </svg>
   <div id="hui"><div class="lbl" id="hlbl">Gesichtserkennung wird kalibriert …</div><button class="btn" id="hbtn" hidden>Weiter</button></div>
   <div id="hwarn">
-    <svg id="hface" viewBox="0 0 400 400" aria-hidden="true"><rect width="400" height="400" fill="#000"/>
-      <circle cx="200" cy="210" r="150" fill="#0d0d10"/>
-      <ellipse cx="150" cy="180" rx="34" ry="46" fill="#ff2d3f"/><ellipse cx="250" cy="180" rx="34" ry="46" fill="#ff2d3f"/>
-      <ellipse cx="150" cy="180" rx="10" ry="18" fill="#000"/><ellipse cx="250" cy="180" rx="10" ry="18" fill="#000"/>
-      <path d="M140 290q60 50 120 0" stroke="#ff2d3f" stroke-width="10" fill="none" stroke-linecap="round"/>
-      <path d="M150 300l12-14 14 14 14-14 14 14 14-14 14 14 14-14 12 14" stroke="#000" stroke-width="6" fill="none"/>
+    <svg id="hface" viewBox="0 0 400 420" aria-hidden="true"><rect width="400" height="420" fill="#000"/>
+      <ellipse cx="200" cy="220" rx="160" ry="185" fill="#0b0b0e"/>
+      <ellipse cx="140" cy="185" rx="42" ry="56" fill="#ff2d3f"/><ellipse cx="260" cy="185" rx="42" ry="56" fill="#ff2d3f"/>
+      <ellipse cx="140" cy="190" rx="13" ry="24" fill="#000"/><ellipse cx="260" cy="190" rx="13" ry="24" fill="#000"/>
+      <path d="M120 300q80 70 160 0" stroke="#ff2d3f" stroke-width="12" fill="none" stroke-linecap="round"/>
+      <path d="M128 312l16-18 18 18 18-18 18 18 18-18 18 18 18-18 18 18 16-18" stroke="#000" stroke-width="7" fill="none"/>
     </svg>
   </div>
 </section>
 
-<!-- 3) Glitch -->
-<section class="scene" id="glitch"><canvas id="gcv"></canvas><div id="gtxt"></div></section>
+<!-- 3) Besessen -->
+<section class="scene" id="besessen">
+  <div id="bstart">
+    <div class="ic" aria-hidden="true">&#x1F4F2;</div>
+    <h2>Geräte-Kopplung</h2>
+    <p>Ein Gerät in deiner Nähe möchte sich verbinden. Tippe zum Fortfahren.</p>
+    <button class="btn big" id="bbtn">Verbinden</button>
+  </div>
+  <canvas id="bcv"></canvas>
+  <div id="bstrobe"></div>
+  <div id="bpop"></div>
+  <div id="bbig"></div>
+</section>
 
 <section id="reveal"><div class="box">
   <h1 id="rhead"></h1>
@@ -98,6 +127,6 @@
   <a class="btn ghost" href="/tap.html?via=grusel">Wer steckt dahinter?</a>
 </div></section>
 
-<script src="grusel.js?v=1"></script>
+<script src="grusel.js?v=2"></script>
 </body>
 </html>
