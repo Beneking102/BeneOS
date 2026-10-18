@@ -277,6 +277,7 @@
   const last = store.get("chaos.last");
   const pool = keys.filter(k => k !== last);
   const pick = PRANKS[forced] ? forced : pool[Math.random() * pool.length | 0];
+  if (PRANKS[forced] && $("rmore")) { $("rmore").textContent = ""; $("again").textContent = "Noch mehr Streiche"; }
   store.set("chaos.last", pick);
   PRANKS[pick]();
 })();
