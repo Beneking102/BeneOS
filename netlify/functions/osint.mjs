@@ -5,17 +5,13 @@ const json = (o, status = 200) => new Response(JSON.stringify(o), { status, head
 
 export default async (req, context) => {
   const geo = { city: "", region: "", country: "", org: "", tz: "" };
-  // Netlify kennt Stadt/Land/Zeitzone meist selbst
-  try {
-    const g = context.geo || {};
-    geo.city = g.city || "";
-    geo.region = g.subdivision?.name || "";
-    geo.country = g.country?.name || "";
-    geo.tz = g.timezone || "";
-  } catch { /* egal */ }
+  // Hinter Cloudflare steht die echte Besucher-IP im Header cf-connecting-ip,
+  // sonst im ersten Eintrag von x-forwarded-for; context.ip wäre nur die Cloudflare-IP.
+  const h = req.headers;
+  const xff = (h.get("x-forwarded-for") || "").split(",")[0].trim();
+  const ip = h.get("cf-connecting-ip") || xff || context.ip || "";
   // Provider/ISP kommt von einem IP-Dienst (serverseitig, die IP verlässt den Server nicht Richtung Browser)
   try {
-    const ip = context.ip || "";
     if (ip) {
       const r = await fetch(`https://ipapi.co/${ip}/json/`, { headers: { "user-agent": "beneos" }, signal: AbortSignal.timeout(2500) });
       if (r.ok) {
