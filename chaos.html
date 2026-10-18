@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#000000">
+<title>Lädt …</title>
+<meta name="robots" content="noindex">
+<style>
+  :root { --g: #39ff7a; --w: #fff; --mut: #9aa4ae; --red: #ff4d6d; --gold: #ffc23d; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: #000; color: var(--w); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+               overflow: hidden; user-select: none; touch-action: manipulation; }
+  .scene { position: fixed; inset: 0; display: none; }
+  .scene.on { display: block; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+
+  /* ---------- Gemeinsame Auflösung ---------- */
+  #reveal { position: fixed; inset: 0; z-index: 50; display: none; place-items: center; padding: 24px 16px;
+            background: radial-gradient(circle at 50% 30%, #12301f, #020604 70%); text-align: center; }
+  #reveal.on { display: grid; animation: pop .5s cubic-bezier(.2, 1.4, .4, 1); }
+  @keyframes pop { from { transform: scale(.7); opacity: 0; } to { transform: none; opacity: 1; } }
+  #reveal .box { max-width: 420px; }
+  #reveal h1 { font-size: 34px; margin: 6px 0; color: var(--g); text-shadow: 0 0 22px rgba(57,255,122,.5); }
+  #reveal .victim { font: 800 64px/1 ui-monospace, Consolas, monospace; color: var(--w); margin: 12px 0 2px; }
+  #reveal .lbl { color: var(--mut); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
+  #reveal p { color: #cfe; opacity: .85; }
+  .btn { display: block; padding: 14px; margin: 10px 0 0; border-radius: 12px; border: 1px solid #2e8f57; color: var(--g);
+         text-decoration: none; font-weight: 700; background: transparent; font-size: 16px; width: 100%; font-family: inherit; }
+  .btn.solid { background: var(--g); color: #04140a; border: 0; }
+
+  /* ---------- 1) Display-Bruch ---------- */
+  #crack .fake { padding: 60px 20px; color: #333; }
+  #crack .fake h2 { color: #222; } #crack .fake p { color: #1e1e1e; }
+  #crack { background: #f4f4f4; }
+  #crack .fake .sk { height: 14px; background: #ddd; border-radius: 7px; margin: 12px 0; }
+
+  /* ---------- 2) Endlos-Update ---------- */
+  #update { background: #0b57d0; color: #fff; text-align: center; }
+  #update .wrap { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(86vw, 380px); }
+  #update .spin { width: 54px; height: 54px; border: 5px solid rgba(255,255,255,.25); border-top-color: #fff; border-radius: 50%; margin: 0 auto 26px; animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #update .pct { font-size: 56px; font-weight: 300; }
+  #update .msg { opacity: .85; min-height: 3em; }
+  #update small { opacity: .6; }
+
+  /* ---------- 3) Schwerkraft ---------- */
+  #grav { background: #fafafa; color: #111; }
+  #grav .art { padding: 40px 20px; }
+  #grav .art h2 { font-size: 26px; line-height: 1.2; margin: 0 0 10px; }
+  #grav .w { display: inline-block; white-space: pre; will-change: transform; }
+
+  /* ---------- 4) Hypno-Orakel ---------- */
+  #orakel { background: #000; text-align: center; }
+  #orakel .txt { position: absolute; left: 0; right: 0; bottom: 14%; padding: 0 20px; font-size: 22px; font-weight: 700; text-shadow: 0 2px 12px #000; min-height: 3em; }
+  #orakel .small { position: absolute; left: 0; right: 0; top: 8%; color: var(--mut); letter-spacing: 3px; font-size: 12px; }
+
+  /* ---------- 5) Akku-Panik ---------- */
+  #akku { background: #000; text-align: center; }
+  #akku .bat { width: 120px; height: 220px; border: 6px solid #fff; border-radius: 18px; margin: 18vh auto 24px; position: relative; padding: 8px; }
+  #akku .bat::before { content: ""; position: absolute; top: -20px; left: 35px; width: 38px; height: 14px; background: #fff; border-radius: 6px 6px 0 0; }
+  #akku .lvl { position: absolute; left: 8px; right: 8px; bottom: 8px; background: var(--red); border-radius: 8px; height: 4%; transition: height .4s, background .4s; }
+  #akku .num { font: 800 54px ui-monospace, Consolas, monospace; }
+  #akku .t { color: var(--mut); min-height: 3em; padding: 0 20px; }
+  #akku button { max-width: 300px; margin: 16px auto 0; }
+
+  /* ---------- 6) Rickroll ---------- */
+  #rick { background: #0e0e10; text-align: center; }
+  #rick .wrap { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(86vw, 360px); }
+  #rick .lock { font-size: 54px; }
+  #rick h2 { margin: 8px 0 2px; }
+  #rick p { color: var(--mut); margin: 4px 0; }
+  .rbar { height: 6px; background: #222; border-radius: 4px; overflow: hidden; margin: 18px 0 8px; }
+  .rbar i { display: block; height: 100%; width: 0; background: #ff0033; transition: width .2s; }
+  .rsmall { font: 12px ui-monospace, Consolas, monospace; }
+
+  /* ---------- 7) Hacker-Übernahme ---------- */
+  #hack { background: #000; }
+  #hterm { position: absolute; inset: 0; margin: 0; padding: 24px 14px; color: var(--g); font: 13px/1.45 ui-monospace, Consolas, monospace;
+           white-space: pre-wrap; word-break: break-all; text-shadow: 0 0 6px rgba(57,255,122,.7); overflow: hidden; }
+  #hterm .r { color: var(--red); text-shadow: 0 0 8px rgba(255,77,109,.8); }
+  #hterm .w { color: #fff; }
+  #hbig { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center; font: 900 44px/1.1 ui-monospace, Consolas, monospace;
+          color: var(--red); text-shadow: 0 0 24px var(--red); display: none; }
+  #hack.glitch { animation: glitch .25s steps(2) infinite; }
+  @keyframes glitch { 0% { transform: translate(0); filter: none; } 33% { transform: translate(-5px, 2px); filter: hue-rotate(90deg); }
+                      66% { transform: translate(4px, -3px); filter: invert(1); } 100% { transform: translate(0); } }
+  #hack.red { background: #200; }
+
+  /* ---------- 8) Captcha ---------- */
+  #captcha { background: #f2f2f2; color: #222; }
+  .cwrap { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(92vw, 380px); background: #fff; border: 1px solid #ccc; box-shadow: 0 6px 30px rgba(0,0,0,.15); }
+  .chead { background: #1a73e8; color: #fff; padding: 18px 16px; font-size: 18px; line-height: 1.3; }
+  .chead small { display: block; opacity: .8; font-size: 12px; margin-top: 4px; }
+  .cgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 8px; }
+  .cgrid div { aspect-ratio: 1; display: grid; place-items: center; font-size: 40px; background: #eef2f7; cursor: pointer; transition: transform .15s; position: relative; }
+  .cgrid div.sel { transform: scale(.86); outline: 3px solid #1a73e8; }
+  .cfoot { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-top: 1px solid #ddd; gap: 10px; }
+  #cerr { color: #d93025; font-size: 13px; flex: 1; }
+  #cbtn { background: #1a73e8; color: #fff; border: 0; padding: 12px 18px; font-weight: 700; border-radius: 2px; }
+
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: .01s !important; } }
+</style>
+</head>
+<body>
+
+<!-- 1) Display-Bruch: sieht aus wie eine ganz normale Seite, dann springt das Glas -->
+<section class="scene" id="crack">
+  <div class="fake">
+    <h2>Seite wird geladen …</h2>
+    <div class="sk" style="width:90%"></div><div class="sk" style="width:70%"></div><div class="sk" style="width:84%"></div>
+    <div class="sk" style="width:60%"></div><div class="sk" style="width:76%"></div>
+  </div>
+  <canvas id="crackcv"></canvas>
+</section>
+
+<!-- 2) Endlos-Update -->
+<section class="scene" id="update">
+  <div class="wrap">
+    <div class="spin"></div>
+    <div class="pct" id="upct">0 %</div>
+    <div class="msg" id="umsg">Update wird installiert.<br>Gerät nicht ausschalten.</div>
+    <small>Das kann ein paar Minuten dauern</small>
+  </div>
+</section>
+
+<!-- 3) Schwerkraft: der Artikel fällt auseinander -->
+<section class="scene" id="grav">
+  <div class="art" id="gart">
+    <h2>Neue Studie: Wer fremde NFC-Chips antippt, ist überdurchschnittlich neugierig</h2>
+    <p>Forscher aus Bayern haben herausgefunden, dass Menschen, die unbekannte Aufkleber mit dem Handy antippen, deutlich häufiger auf Streiche hereinfallen. Besonders betroffen sind Personen, die genau jetzt diesen Text lesen. Die Wissenschaftler empfehlen, das Handy ab sofort gut festzuhalten, da sich der Inhalt der Seite in den nächsten Sekunden</p>
+  </div>
+</section>
+
+<!-- 4) Hypno-Orakel -->
+<section class="scene" id="orakel">
+  <canvas id="hypcv"></canvas>
+  <div class="small">DAS ORAKEL SPRICHT</div>
+  <div class="txt" id="otxt"></div>
+</section>
+
+<!-- 5) Akku-Panik -->
+<section class="scene" id="akku">
+  <div class="bat"><div class="lvl" id="alvl"></div></div>
+  <div class="num" id="anum">4 %</div>
+  <div class="t" id="at">Akku fast leer.</div>
+  <button class="btn solid" id="abtn" hidden>Energiesparmodus aktivieren</button>
+</section>
+
+<!-- 6) Rickroll mit Tarnung -->
+<section class="scene" id="rick">
+  <div class="wrap">
+    <div class="lock">&#x1F512;</div>
+    <h2>Vertrauliches Video</h2>
+    <p>Freigabe für dieses Gerät wird geprüft …</p>
+    <div class="rbar"><i id="rbar"></i></div>
+    <p class="rsmall" id="rmsg">Entschlüssele Stream</p>
+  </div>
+</section>
+
+<!-- 7) Hacker-Übernahme -->
+<section class="scene" id="hack">
+  <canvas id="hackcv"></canvas>
+  <pre id="hterm"></pre>
+  <div id="hbig"></div>
+</section>
+
+<!-- 8) Captcha aus der Hölle -->
+<section class="scene" id="captcha">
+  <div class="cwrap">
+    <div class="chead"><span id="cq">Wähle alle Bilder mit <b>Ampeln</b></span><small id="cstep">Schritt 1 von 4</small></div>
+    <div class="cgrid" id="cgrid"></div>
+    <div class="cfoot"><span id="cerr"></span><button id="cbtn">BESTÄTIGEN</button></div>
+  </div>
+</section>
+
+<section id="reveal">
+  <div class="box">
+    <div class="lbl" id="rkind">Chaos-Chip</div>
+    <h1 id="rhead">Reingelegt!</h1>
+    <p id="rtext"></p>
+    <div class="victim" id="rnum">#?</div>
+    <div class="lbl">Opfer dieses Chips</div>
+    <p style="font-size:13px;margin-top:18px">Nichts davon war echt, nichts hat dein Handy verlassen. Tipp den Chip nochmal an – es kommt jedes Mal was anderes.</p>
+    <button class="btn solid" id="again">Nochmal!</button>
+    <a class="btn" href="/tap.html?via=chaos">Wer steckt dahinter?</a>
+  </div>
+</section>
+
+<script src="chaos.js"></script>
+</body>
+</html>
