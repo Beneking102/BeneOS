@@ -99,6 +99,61 @@
   #cerr { color: #d93025; font-size: 13px; flex: 1; }
   #cbtn { background: #1a73e8; color: #fff; border: 0; padding: 12px 18px; font-weight: 700; border-radius: 2px; }
 
+  /* ---------- 9) Fake-Anruf ---------- */
+  #anruf { background: linear-gradient(#1f2a3a, #0b0f16); text-align: center; }
+  .call { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; padding-top: 16vh; }
+  .cav { width: 120px; height: 120px; border-radius: 50%; background: #2c3b52; display: grid; place-items: center; font-size: 60px; animation: ring 1.2s infinite; }
+  @keyframes ring { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,.35); } 70% { box-shadow: 0 0 0 26px rgba(255,255,255,0); } }
+  .cname { font-size: 30px; margin-top: 22px; }
+  .csub { color: var(--mut); min-height: 3em; padding: 0 20px; }
+  .cbtns { position: absolute; bottom: 12vh; left: 0; right: 0; display: flex; justify-content: space-around; }
+  .cbtns button { width: 76px; height: 76px; border-radius: 50%; border: 0; font-size: 32px; color: #fff; }
+  .cno { background: #e5484d; } .cyes { background: #30a46c; animation: bob .9s infinite; }
+  @keyframes bob { 50% { transform: translateY(-8px); } }
+
+  /* ---------- 10) Selfie-Fahndung ---------- */
+  #gesucht { background: #2b1d10; display: none; place-items: center; text-align: center; }
+  #gesucht.on { display: grid; }
+  .poster { width: min(84vw, 340px); background: #e9d8b0; color: #3b2510; padding: 16px; box-shadow: 0 10px 40px rgba(0,0,0,.6); transform: rotate(-2deg);
+            font-family: Georgia, "Times New Roman", serif; }
+  .ptop { font-size: 52px; font-weight: 900; letter-spacing: 4px; line-height: 1; }
+  .pimg { position: relative; aspect-ratio: 1; margin: 12px 0; background: #c9b48a; overflow: hidden; border: 3px solid #3b2510; }
+  .pimg video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); filter: sepia(1) contrast(1.2) brightness(.95); }
+  .psil { position: absolute; inset: 0; display: grid; place-items: center; font-size: 120px; opacity: .55; }
+  .pcrime { font-size: 17px; font-style: italic; }
+  .preward { font-size: 22px; font-weight: 900; margin-top: 10px; }
+  .pnote { color: #e9d8b0; opacity: .8; margin-top: 18px; padding: 0 16px; }
+
+  /* ---------- 11) Glücksrad ---------- */
+  #rad { background: radial-gradient(circle at 50% 30%, #4a1d6b, #12051c 70%); text-align: center; }
+  .rwrap { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(90vw, 380px); }
+  #rh { font-size: 22px; line-height: 1.25; }
+  .wheelbox { position: relative; width: min(80vw, 300px); margin: 12px auto; }
+  #wheel { position: static; width: 100%; height: auto; display: block; }
+  .pin { position: absolute; left: 50%; top: -6px; transform: translateX(-50%); width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent;
+         border-top: 26px solid #fff; z-index: 2; filter: drop-shadow(0 2px 4px #000); }
+
+  /* ---------- 12) Kopfstand ---------- */
+  #kopf { background: #fffbe6; color: #222; }
+  .kwrap { position: absolute; inset: 0; padding: 40px 22px; transform: rotate(180deg); transition: transform 1s cubic-bezier(.2, 1.4, .4, 1); text-align: center; }
+  .kwrap.ok { transform: rotate(0deg); }
+  .kbig { font-size: 90px; margin-top: 20px; }
+
+  /* ---------- 13) Schüttel-Challenge ---------- */
+  #shake { background: linear-gradient(#0d2238, #04101c); text-align: center; }
+  .swrap { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(88vw, 360px); }
+  .semm { font-size: 96px; transition: transform .1s; }
+  .therm { height: 16px; background: #183048; border-radius: 9px; overflow: hidden; margin: 18px 0 8px; }
+  .therm i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #4aa8ff, #ffc23d, #ff4d6d); transition: width .2s; }
+  .snum { font: 800 34px ui-monospace, Consolas, monospace; }
+
+  /* ---------- 14) Fliege ---------- */
+  #fliege { background: #fafafa; }
+  .fake2 { padding: 60px 20px; color: #333; }
+  .fake2 .sk { height: 14px; background: #ddd; border-radius: 7px; margin: 12px 0; }
+  #fly { position: fixed; left: 0; top: 0; font-size: 34px; will-change: transform; z-index: 5; cursor: pointer; padding: 18px; margin: -18px; }
+  #splat { position: fixed; font-size: 60px; display: none; z-index: 4; }
+
   @media (prefers-reduced-motion: reduce) { * { animation-duration: .01s !important; } }
 </style>
 </head>
@@ -174,6 +229,65 @@
   </div>
 </section>
 
+<!-- 9) Fake-Anruf -->
+<section class="scene" id="anruf">
+  <div class="call">
+    <div class="cav">&#x1F96A;</div>
+    <div class="cname">Leberkäs-Hotline</div>
+    <div class="csub" id="csub">eingehender Anruf …</div>
+    <div class="cbtns"><button class="cno" id="cno" aria-label="Ablehnen">&#x2715;</button><button class="cyes" id="cyes" aria-label="Annehmen">&#x2706;</button></div>
+  </div>
+</section>
+
+<!-- 10) Selfie-Fahndung -->
+<section class="scene" id="gesucht">
+  <div class="poster">
+    <div class="ptop">GESUCHT</div>
+    <div class="pimg"><video id="pvid" playsinline muted></video><div class="psil" id="psil">&#x1F464;</div></div>
+    <div class="pcrime">wegen unerlaubten Antippens fremder NFC-Chips</div>
+    <div class="preward">Belohnung: 1 Leberkässemmel</div>
+  </div>
+  <p class="pnote" id="pnote">Fahndungsfoto wird erstellt …</p>
+</section>
+
+<!-- 11) Glücksrad -->
+<section class="scene" id="rad">
+
+  <div class="rwrap">
+    <h2 id="rh">&#x1F389; Du bist der 1.000.000. Besucher! &#x1F389;</h2>
+    <div class="wheelbox"><div class="pin"></div><canvas id="wheel" width="560" height="560"></canvas></div>
+    <button class="btn solid" id="spin">DREHEN!</button>
+  </div>
+</section>
+
+<!-- 12) Kopfstand -->
+<section class="scene" id="kopf">
+  <div class="kwrap" id="kwrap">
+    <h2>Achtung!</h2>
+    <p>Diese Seite wurde versehentlich falsch herum ausgeliefert.</p>
+    <p>Bitte drehe dein Handy einmal komplett um, damit wir das Problem beheben können.</p>
+    <div class="kbig">&#x1F643;</div>
+  </div>
+</section>
+
+<!-- 13) Schüttel-Challenge -->
+<section class="scene" id="shake">
+  <div class="swrap">
+    <div class="semm" id="semm">&#x1F96A;</div>
+    <h2>Semmel ist noch kalt!</h2>
+    <p>Schüttel dein Handy, um den Leberkäs aufzuwärmen.</p>
+    <div class="therm"><i id="therm"></i></div>
+    <div class="snum" id="snum">8 °C</div>
+  </div>
+</section>
+
+<!-- 14) Fliege auf dem Display -->
+<section class="scene" id="fliege">
+  <div class="fake2"><h2>Artikel wird geladen …</h2><div class="sk" style="width:88%"></div><div class="sk" style="width:72%"></div><div class="sk" style="width:80%"></div><div class="sk" style="width:64%"></div></div>
+  <div id="fly">&#x1FAB0;</div>
+  <div id="splat">&#x1F4A5;</div>
+</section>
+
 <section id="reveal">
   <div class="box">
     <div class="lbl" id="rkind">Chaos-Chip</div>
@@ -187,6 +301,6 @@
   </div>
 </section>
 
-<script src="chaos.js?v=2"></script>
+<script src="chaos.js?v=3"></script>
 </body>
 </html>
