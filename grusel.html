@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#000000">
+<title>…</title>
+<meta name="robots" content="noindex">
+<style>
+  :root { --w: #fff; --mut: #8a8f98; --red: #ff2d3f; --g: #39ff7a; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: #000; color: var(--w);
+               font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; overflow: hidden; user-select: none; touch-action: manipulation; }
+  .scene { position: fixed; inset: 0; display: none; }
+  .scene.on { display: block; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  .btn { display: block; padding: 15px; margin: 12px auto 0; max-width: 340px; width: calc(100% - 32px); border-radius: 12px;
+         border: 1px solid #333; color: var(--w); background: #111; text-decoration: none; font-weight: 700; font-size: 16px; text-align: center; }
+  .btn.ghost { background: transparent; color: var(--mut); }
+
+  /* ---------- 1) Wir sehen dich ---------- */
+  #sehen { background: #000; }
+  #sterm { position: absolute; inset: 0; margin: 0; padding: 26px 16px; color: var(--g); font: 15px/1.7 ui-monospace, Consolas, monospace;
+           white-space: pre-wrap; word-break: break-word; text-shadow: 0 0 7px rgba(57,255,122,.6); }
+  #sterm .w { color: var(--w); } #sterm .r { color: var(--red); text-shadow: 0 0 8px rgba(255,45,63,.7); }
+  .cur { display: inline-block; width: .55em; height: 1.05em; background: var(--g); vertical-align: -2px; animation: bl .8s steps(1) infinite; }
+  @keyframes bl { 50% { opacity: 0; } }
+
+  /* ---------- 2) Hinter dir ---------- */
+  #hinter { background: #05060a; }
+  #hvid { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); filter: brightness(.82) contrast(1.05); }
+  #hscan { position: fixed; left: 0; right: 0; height: 2px; background: rgba(57,255,122,.8); box-shadow: 0 0 14px var(--g); top: 0; }
+  #hfig { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 46%; max-width: 230px; opacity: 0; pointer-events: none; }
+  #hui { position: fixed; left: 0; right: 0; bottom: 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, rgba(0,0,0,.85) 40%); text-align: center; }
+  #hui .lbl { font: 13px ui-monospace, Consolas, monospace; color: var(--g); letter-spacing: 1px; min-height: 2.4em; }
+  #hwarn { position: fixed; inset: 0; display: none; place-items: center; background: #000; z-index: 6; }
+  #hwarn.on { display: grid; }
+  #hface { width: min(92vw, 460px); opacity: 0; }
+
+  /* ---------- 3) Glitch ---------- */
+  #glitch { background: #000; }
+  #gcv { position: fixed; inset: 0; }
+  #gtxt { position: fixed; left: 0; right: 0; top: 42%; transform: translateY(-50%); text-align: center; padding: 0 18px;
+          font: 800 26px/1.25 ui-monospace, Consolas, monospace; color: var(--w); text-shadow: 0 0 16px var(--red); }
+  #gtxt small { display: block; font-size: 14px; font-weight: 400; color: var(--mut); margin-top: 10px; letter-spacing: 1px; }
+  body.gl #glitch { animation: gl .22s steps(2) infinite; }
+  @keyframes gl { 0% { transform: translate(0); filter: none; } 30% { transform: translate(-6px, 2px); filter: hue-rotate(80deg); }
+                  60% { transform: translate(5px, -3px); filter: invert(1); } 100% { transform: translate(0); } }
+
+  /* ---------- Auflösung ---------- */
+  #reveal { position: fixed; inset: 0; z-index: 50; display: none; place-items: center; padding: 26px 16px; text-align: center;
+            background: radial-gradient(circle at 50% 30%, #10261a, #020604 72%); }
+  #reveal.on { display: grid; animation: up .5s ease-out; }
+  @keyframes up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  #reveal .box { max-width: 420px; }
+  #reveal h1 { font-size: 30px; margin: 4px 0 8px; color: var(--g); text-shadow: 0 0 20px rgba(57,255,122,.5); }
+  #reveal p { color: #dfe; opacity: .9; }
+  #reveal .tech { font-size: 13px; color: var(--mut); margin-top: 16px; }
+
+  @media (prefers-reduced-motion: reduce) { body.gl #glitch { animation: none; } }
+</style>
+</head>
+<body>
+
+<!-- 1) Wir sehen dich -->
+<section class="scene" id="sehen"><pre id="sterm"></pre></section>
+
+<!-- 2) Hinter dir -->
+<section class="scene" id="hinter">
+  <video id="hvid" playsinline muted autoplay></video>
+  <div id="hscan"></div>
+  <svg id="hfig" viewBox="0 0 200 320" aria-hidden="true"><defs><radialGradient id="fg" cx="50%" cy="30%" r="70%"><stop offset="0%" stop-color="#1a1a1f"/><stop offset="100%" stop-color="#000"/></radialGradient></defs>
+    <ellipse cx="100" cy="300" rx="90" ry="40" fill="#000" opacity=".5"/>
+    <path d="M100 40c-34 0-54 26-54 70 0 30-14 44-22 70-6 20-10 40-10 70h172c0-30-4-50-10-70-8-26-22-40-22-70 0-44-20-70-54-70z" fill="url(#fg)"/>
+    <circle cx="100" cy="70" r="40" fill="url(#fg)"/>
+    <circle cx="84" cy="66" r="6" fill="#ff2d3f"/><circle cx="116" cy="66" r="6" fill="#ff2d3f"/>
+  </svg>
+  <div id="hui"><div class="lbl" id="hlbl">Gesichtserkennung wird kalibriert …</div><button class="btn" id="hbtn" hidden>Weiter</button></div>
+  <div id="hwarn">
+    <svg id="hface" viewBox="0 0 400 400" aria-hidden="true"><rect width="400" height="400" fill="#000"/>
+      <circle cx="200" cy="210" r="150" fill="#0d0d10"/>
+      <ellipse cx="150" cy="180" rx="34" ry="46" fill="#ff2d3f"/><ellipse cx="250" cy="180" rx="34" ry="46" fill="#ff2d3f"/>
+      <ellipse cx="150" cy="180" rx="10" ry="18" fill="#000"/><ellipse cx="250" cy="180" rx="10" ry="18" fill="#000"/>
+      <path d="M140 290q60 50 120 0" stroke="#ff2d3f" stroke-width="10" fill="none" stroke-linecap="round"/>
+      <path d="M150 300l12-14 14 14 14-14 14 14 14-14 14 14 14-14 12 14" stroke="#000" stroke-width="6" fill="none"/>
+    </svg>
+  </div>
+</section>
+
+<!-- 3) Glitch -->
+<section class="scene" id="glitch"><canvas id="gcv"></canvas><div id="gtxt"></div></section>
+
+<section id="reveal"><div class="box">
+  <h1 id="rhead"></h1>
+  <p id="rtext"></p>
+  <p class="tech" id="rtech"></p>
+  <button class="btn" id="again">Nochmal gruseln</button>
+  <a class="btn ghost" href="/tap.html?via=grusel">Wer steckt dahinter?</a>
+</div></section>
+
+<script src="grusel.js?v=1"></script>
+</body>
+</html>
